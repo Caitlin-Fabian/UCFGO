@@ -7,7 +7,7 @@ export default function App() {
 
     return (
         <View style={styles.container}>
-            <Text>Inserts maps API here</Text>
+            <Text>Placeholder</Text>
             <Image style={styles.logoContainer} source={require('./Logo.png')} />
             <View style={styles.tempButton}>
                 <Button title='temp' titleStyle onPress={() => setShouldShow(!shouldShow)}/>
