@@ -23,10 +23,10 @@ export default function App() {
                     <Button title='profile' titleStyle onPress={() => {setShouldShowProfile(!shouldShowProfile); setShouldShowButtons(!shouldShowButtons);}} />
                     </View>
                     <View style={styles.inventoryButton}>
-                    <Button title='inventory' titleStyle onPress={() => setShouldShowInventory(!shouldShowInventory)}/>
+                    <Button title='inventory' titleStyle onPress={() => {setShouldShowInventory(!shouldShowInventory); setShouldShowButtons(!shouldShowButtons);}}/>
                     </View>
                     <View style={styles.settingsButton}>
-                    <Button title='settings' titleStyle onPress={() => setShouldShowSettings(!shouldShowSettings)}/>
+                    <Button title='settings' titleStyle onPress={() => {setShouldShowSettings(!shouldShowSettings); setShouldShowButtons(!shouldShowButtons);}}/>
                     </View>
                 </View>
             )
@@ -39,7 +39,38 @@ export default function App() {
                             <Image style={styles.backButton} source={require('./BackButton.png')} />
                         </TouchableOpacity>
                         <Text style={styles.titleTxt}>PROFILE</Text>
+                        <View style={styles.profilePicContainer}></View>
+                        <View style={styles.profileInfoContainter}></View>
                     </View>
+                </View>
+            : null}
+            {shouldShowInventory ? 
+                <View style={styles.greyOverlay}>
+                    <View style={styles.headerContainer}>
+                        <Image style={styles.logoContainer} source={require('./Logo.png')} />
+                        <TouchableOpacity style={styles.backButtonContainer} activeOpacity={0.2} onPress={() => setShouldShowInventory(!shouldShowInventory)}>
+                            <Image style={styles.backButton} source={require('./BackButton.png')} />
+                        </TouchableOpacity>
+                        <Text style={styles.titleTxt}>MONSTERS</Text>
+                    </View>
+                    <View style={styles.monsterCardsContainer}>
+                        <View style={styles.monsterCard}></View>
+                        <View style={styles.monsterCard}></View>
+                        <View style={styles.monsterCard}></View>
+                    </View>
+                </View>
+            : null}
+            {shouldShowSettings ? 
+                <View style={styles.greyOverlay}>
+                    <View style={styles.headerContainer}>
+                        <Image style={styles.logoContainer} source={require('./Logo.png')} />
+                        <TouchableOpacity style={styles.backButtonContainer} activeOpacity={0.2} onPress={() => setShouldShowSettings(!shouldShowSettings)}>
+                            <Image style={styles.backButton} source={require('./BackButton.png')} />
+                        </TouchableOpacity>
+                        <Text style={styles.titleTxt}>SETTINGS</Text>
+                    </View>
+                    <View style={styles.changePasswordContainer}><Text style={{fontWeight: 'bold', fontSize: 20}}>CHANGE PASSWORD</Text></View>
+                    <View style={styles.signOutContainer}><Text style={{fontWeight: 'bold', fontSize: 20}}>SIGN OUT</Text></View>
                 </View>
             : null}
             <StatusBar style="auto" />
@@ -58,12 +89,8 @@ const styles = StyleSheet.create({
         position: 'absolute',
         alignSelf: 'center',
         top: 50,
-        alignItems: 'center',
-        justifyContent: 'center',
         height: 50,
         width: 50,
-        backgroundColor: '#fff',
-        borderRadius: 100
     },
     buttonsContainer: {
         position: 'absolute',
@@ -144,5 +171,61 @@ const styles = StyleSheet.create({
         alignSelf: 'center',
         fontWeight: 'bold',
         fontSize: 40
+    },
+    profilePicContainer: {
+        position: 'absolute',
+        top: 220,
+        alignSelf: 'center',
+        backgroundColor: '#fff',
+        borderRadius: 25,
+        height: 250,
+        width: 250
+    },
+    profileInfoContainter: {
+        position: 'absolute',
+        top: 500,
+        alignSelf: 'center',
+        backgroundColor: '#fff',
+        borderRadius: 25,
+        height: 300,
+        width: 350
+    },
+    monsterCardsContainer: {
+        position: 'absolute',
+        top: 220,
+        alignSelf: 'center',
+        height: 570,
+        width: '100%',
+        alignItems: 'flex-start',
+        flexDirection: 'row',
+        justifyContent: 'space-around'
+    },
+    monsterCard: {
+        backgroundColor: '#fff',
+        borderRadius: 10,
+        height: 100,
+        width: 100
+    },
+    changePasswordContainer: {
+        position: 'absolute',
+        bottom: 30,
+        alignSelf: 'center',
+        width: '80%',
+        height: '7%',
+        backgroundColor: '#fff',
+        borderRadius: 10,
+        justifyContent: 'center',
+        alignItems: 'center'
+    },
+    signOutContainer: {
+        position: 'absolute',
+        bottom: 115,
+        alignSelf: 'center',
+        width: '80%',
+        height: '7%',
+        backgroundColor: '#fff',
+        borderRadius: 10,
+        justifyContent: 'center',
+        alignItems: 'center'
     }
 });
