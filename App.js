@@ -1,33 +1,47 @@
 import { StatusBar } from 'expo-status-bar';
 import React, { useState } from 'react';
-import { StyleSheet, Text, View, Image, Button } from 'react-native';
+import { StyleSheet, Text, View, Image, Button, TouchableOpacity } from 'react-native';
 
 export default function App() {
-    const [shouldShow, setShouldShow] = useState(false);
+    const [shouldShowButtons, setShouldShowButtons] = useState(false);
+    const [shouldShowProfile, setShouldShowProfile] = useState(false);
+    const [shouldShowInventory, setShouldShowInventory] = useState(false);
+    const [shouldShowSettings, setShouldShowSettings] = useState(false);
+    const [shouldBack, setShouldBack] = useState(false);
 
     return (
         <View style={styles.container}>
             <Text>Inserts maps API here</Text>
-            <Image style={styles.logoContainer} source={require('./Logo.png')} />
-            <View style={styles.tempButton}>
-                <Button title='temp' titleStyle onPress={() => setShouldShow(!shouldShow)}/>
+            <Image style={styles.logoContainer} source={require('./Logo.png') }/>
+            <View style={styles.menuButton}>
+                <Button title='temp' titleStyle onPress={() => setShouldShowButtons(!shouldShowButtons)}/>
             </View>
-            {shouldShow ? 
+            {shouldShowButtons ? 
             (
                 <View style={styles.buttonsContainer}>
                     <View style={styles.profileButton}>
-                    <Button title='profile' titleStyle onPress={() => setShouldShow(!shouldShow)}/>
+                    <Button title='profile' titleStyle onPress={() => {setShouldShowProfile(!shouldShowProfile); setShouldShowButtons(!shouldShowButtons);}} />
                     </View>
                     <View style={styles.inventoryButton}>
-                    <Button title='inventory' titleStyle onPress={() => setShouldShow(!shouldShow)}/>
+                    <Button title='inventory' titleStyle onPress={() => setShouldShowInventory(!shouldShowInventory)}/>
                     </View>
                     <View style={styles.settingsButton}>
-                    <Button title='settings' titleStyle onPress={() => setShouldShow(!shouldShow)}/>
+                    <Button title='settings' titleStyle onPress={() => setShouldShowSettings(!shouldShowSettings)}/>
                     </View>
                 </View>
-                
             )
              : null}
+            {shouldShowProfile ? 
+                <View style={styles.greyOverlay}>
+                    <View style={styles.headerContainer}>
+                        <Image style={styles.logoContainer} source={require('./Logo.png')} />
+                        <TouchableOpacity style={styles.backButtonContainer} activeOpacity={0.2} onPress={() => setShouldShowProfile(!shouldShowProfile)}>
+                            <Image style={styles.backButton} source={require('./BackButton.png')} />
+                        </TouchableOpacity>
+                        <Text style={styles.titleTxt}>PROFILE</Text>
+                    </View>
+                </View>
+            : null}
             <StatusBar style="auto" />
         </View>
     );
@@ -36,7 +50,7 @@ export default function App() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#fff',
+        backgroundColor: '#bebebe',
         alignItems: 'center',
         justifyContent: 'center',
     },
@@ -46,13 +60,17 @@ const styles = StyleSheet.create({
         top: 50,
         alignItems: 'center',
         justifyContent: 'center',
+        height: 50,
+        width: 50,
+        backgroundColor: '#fff',
+        borderRadius: 100
     },
     buttonsContainer: {
         position: 'absolute',
         bottom: 0,
         right: 0
     },
-    tempButton: {
+    menuButton: {
         height: 90,
         width: 90,
         position: 'absolute',
@@ -95,5 +113,36 @@ const styles = StyleSheet.create({
         right: 30,
         alignItems: 'center',
         justifyContent: 'center',
+    },
+    greyOverlay: {
+        position: 'absolute',
+        backgroundColor: 'rgba(70, 70, 70, 0.8)',
+        height: '100%',
+        width: '100%'
+    },
+    backButtonContainer: {
+        position: 'absolute',
+        height: '5%',
+        height: '5%',
+        top: 65,
+        left: 25
+    },
+    backButton: {
+        height: 35,
+        width: 35
+    },
+    headerContainer: {
+        position: 'absolute',
+        top: 0,
+        width: '100%',
+        height: 200,
+        backgroundColor: '#ffc700',
+    },
+    titleTxt: {
+        position: 'absolute',
+        top: 130,
+        alignSelf: 'center',
+        fontWeight: 'bold',
+        fontSize: 40
     }
 });
