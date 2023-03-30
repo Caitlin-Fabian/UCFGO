@@ -1,8 +1,14 @@
 import { StatusBar } from 'expo-status-bar';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { LogBox } from 'react-native';
 import { StyleSheet, Text, View, Image, Button, TouchableOpacity } from 'react-native';
+import ActionButton from 'react-native-action-button'
 
 export default function App() {
+    useEffect(() => {
+        LogBox.ignoreLogs(['Animated: `useNativeDriver`']);
+    });
+
     const [shouldShowButtons, setShouldShowButtons] = useState(false);
     const [shouldShowProfile, setShouldShowProfile] = useState(false);
     const [shouldShowInventory, setShouldShowInventory] = useState(false);
@@ -13,24 +19,17 @@ export default function App() {
         <View style={styles.container}>
             <Text>Inserts maps API here</Text>
             <Image style={styles.logoContainer} source={require('./Logo.png') }/>
-            <View style={styles.menuButton}>
-                <Button title='temp' titleStyle onPress={() => setShouldShowButtons(!shouldShowButtons)}/>
-            </View>
-            {shouldShowButtons ? 
-            (
-                <View style={styles.buttonsContainer}>
-                    <View style={styles.profileButton}>
+            <ActionButton autoInactive='true'>
+                <ActionButton.Item>
                     <Button title='profile' titleStyle onPress={() => {setShouldShowProfile(!shouldShowProfile); setShouldShowButtons(!shouldShowButtons);}} />
-                    </View>
-                    <View style={styles.inventoryButton}>
-                    <Button title='inventory' titleStyle onPress={() => {setShouldShowInventory(!shouldShowInventory); setShouldShowButtons(!shouldShowButtons);}}/>
-                    </View>
-                    <View style={styles.settingsButton}>
+                </ActionButton.Item>
+                <ActionButton.Item>
+                    <Button title='inventory' titleStyle onPress={() => {setShouldShowInventory(!shouldShowInventory); setShouldShowButtons(!shouldShowButtons);}}/>                    
+                </ActionButton.Item>
+                <ActionButton.Item>
                     <Button title='settings' titleStyle onPress={() => {setShouldShowSettings(!shouldShowSettings); setShouldShowButtons(!shouldShowButtons);}}/>
-                    </View>
-                </View>
-            )
-             : null}
+                </ActionButton.Item>
+            </ActionButton>
             {shouldShowProfile ? 
                 <View style={styles.greyOverlay}>
                     <View style={styles.headerContainer}>
@@ -96,17 +95,6 @@ const styles = StyleSheet.create({
         position: 'absolute',
         bottom: 0,
         right: 0
-    },
-    menuButton: {
-        height: 90,
-        width: 90,
-        position: 'absolute',
-        backgroundColor: '#d4af37',
-        borderRadius: 100,
-        bottom: 30,
-        right: 30,
-        alignItems: 'center',
-        justifyContent: 'center',
     },
     profileButton: {
         height: 90,
@@ -227,5 +215,5 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         justifyContent: 'center',
         alignItems: 'center'
-    }
+    },
 });
