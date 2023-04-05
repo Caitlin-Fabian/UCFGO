@@ -2,7 +2,9 @@ import { StatusBar } from 'expo-status-bar';
 import React, { useEffect, useState } from 'react';
 import { LogBox } from 'react-native';
 import { StyleSheet, Text, View, Image, Button, TouchableOpacity } from 'react-native';
-import ActionButton from 'react-native-action-button'
+import ActionButton from 'react-native-action-button';
+import MapView, { Marker } from 'react-native-maps';
+import * as Location from 'expo-location';
 
 export default function App() {
     useEffect(() => {
@@ -14,10 +16,44 @@ export default function App() {
     const [shouldShowInventory, setShouldShowInventory] = useState(false);
     const [shouldShowSettings, setShouldShowSettings] = useState(false);
     const [shouldBack, setShouldBack] = useState(false);
+    const [currLocation, setCurrLocation] = useState({coords: {latitude: 28.60160681694149, longitude: -81.20044675481425}});
+
+    function canInteract(coords) {
+        const distance = Math.sqrt(Math.pow(coords.latitude - currLocation.coords.latitude, 2) + Math.pow(coords.longitude - currLocation.coords.longitude, 2));
+        if (distance <= 0.0008)
+            return true;
+        else
+            return false;
+    }
+
+    useEffect(() => {
+        (async () => {
+          
+          let { status } = await Location.requestForegroundPermissionsAsync();
+          if (status !== 'granted') {
+            setErrorMsg('Permission to access location was denied');
+            return;
+          }
+    
+          let location = await Location.getCurrentPositionAsync({});
+          setCurrLocation(location);
+          //console.log(location)
+        })();
+      }, []);
 
     return (
         <View style={styles.container}>
-            <Text>Inserts maps API here</Text>
+            <MapView style={styles.map}
+                initialRegion={{
+                    latitude: 28.60160681694149,
+                    longitude: -81.20044675481425,
+                    latitudeDelta: 0.0200,
+                    longitudeDelta: 0.0005 ,
+                  }} mapId="6a034a94ab148b12"
+            >
+                <Marker coordinate={{latitude: currLocation.coords.latitude, longitude: currLocation.coords.longitude}} onPress={e => canInteract(e.nativeEvent.coordinate) ? console.log("close enough") : console.log("not close enough")}/>
+                <Marker coordinate={{latitude: 28.60160681694149, longitude: -81.20044675481425,}} onPress={e => canInteract(e.nativeEvent.coordinate) ? console.log("close enough") : console.log("not close enough")}/> 
+            </MapView>
             <Image style={styles.logoContainer} source={require('./Logo.png') }/>
             <ActionButton autoInactive='true'>
                 <ActionButton.Item>
@@ -216,4 +252,8 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center'
     },
+    map: {
+        width: '100%',
+        height: '100%'
+    }
 });
