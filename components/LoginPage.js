@@ -241,7 +241,7 @@ const styles = StyleSheet.create({
     },
     form: {
         flex: 1,
-        // minHeight: width*.7,
+        minHeight: height*.7,
         marginHorizontal: '10%',
         marginTop: '40%',
         marginBottom: '20%',
