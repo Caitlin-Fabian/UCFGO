@@ -12,12 +12,12 @@ import {
     Dimensions,
     Animated
 } from 'react-native';
-// import FormSelectorBtn from './components/FormSelectorBtn.js';
+import FormSelectorBtn from './FormSelectorBtn.js';
 
-const {windowHeight, windowWidth} = Dimensions.get('window');
-const { width } = Dimensions.get('window');
+const height = Dimensions.get('window').height;
+const width = Dimensions.get('window').width;
 
-export default function LoginPage() {
+export default function LoginPage({navigation}) {
     const [loginUsername, setLoginUsername] = useState(' ');
     const [loginPassword, setLoginPassword] = useState(' ');
 
@@ -33,12 +33,12 @@ export default function LoginPage() {
     const scrollView = useRef();
 
     const interpolateL = animation.interpolate({
-        inputRange: [0, width],
-        outputRange: ['rgba(27,27,51,1)', 'rgba(27,27,51,0.4)'],
+        inputRange: [0, (width*.8)],
+        outputRange: ['rgba(27,27,27,1)', 'rgba(27,27,27,0.4)'],
     });
     const interpolateR = animation.interpolate({
-        inputRange: [0, width],
-        outputRange: ['rgba(27,27,51,0.4)', 'rgba(27,27,51,1)'],
+        inputRange: [0, (width*.8)],
+        outputRange: ['rgba(27,27,27,0.4)', 'rgba(27,27,27,1)'],
     });
     
     const onPressLogIn = async() => {
@@ -56,6 +56,7 @@ export default function LoginPage() {
             if(json.id != -1){
                 console.log("Log in success")
                 setLoginMessage("Logged in successfully")
+                navigation.navigate("Map") // find how to navigate to landing/map page
             }
             else{
                 console.log("Log in failed")
@@ -103,30 +104,35 @@ export default function LoginPage() {
                 ></Image>
                 
                 <View style={styles.form}>
-                    {/* <View>
+                    <View style={{flexDirection: 'row'}}>
                         <FormSelectorBtn
                             style={styles.formSelL}
                             backgroundColor={interpolateL}
                             title='Login'
-                            onPress={() => scrollView.current.scrollTo({ x: 0 })}
+                            onPress={() => scrollView.current.scrollTo({x: 0})}
                         />
                         <FormSelectorBtn
                             style={styles.formSelR}
                             backgroundColor={interpolateR}
                             title='Register'
-                            onPress={() => scrollView.current.scrollTo({ x: windowWidth })}
+                            onPress={() => scrollView.current.scrollTo({x: (width*.8)})}
                         />
-                    </View> */}
+                    </View>
                     <ScrollView
                         ref={scrollView}
                         horizontal 
                         pagingEnabled 
-                        // scrollEnabled={false}
-                        // nestedScrollEnabled={false}
+                        showsHorizontalScrollIndicator={false}
+                        scrollEnabled={false}
+                        nestedScrollEnabled={false}
+                        scrollEventThrottle={16}
+                        onScroll={Animated.event(
+                            [{ nativeEvent: { contentOffset: { x: animation } } }],
+                            { useNativeDriver: false }
+                        )}
                         style={styles.scrollForm}>
                         {/* Login */}
                         <View style={styles.login}>
-                            <Text>Login Placeholder</Text>
                             <Text style={styles.inputBoxText}>
                                 Username:</Text>
                             <TextInput
@@ -142,8 +148,11 @@ export default function LoginPage() {
                                 onChangeText={newText => setLoginPassword(newText)}
                             />
                             <Text style={styles.smallText}>
-                                {/* todo: link to register page */}
-                                Don't have an account? <Text style={{textDecorationLine: 'underline'}}>Register</Text>
+                                Don't have an account? <Text 
+                                    onPress={() => scrollView.current.scrollTo({x: (width*.8)})}
+                                    style={{textDecorationLine: 'underline'}}>
+                                        Register
+                                    </Text>
                             </Text>
                             <View style={styles.loginButton}>
                                 {/* todo: connect login api */}
@@ -157,7 +166,6 @@ export default function LoginPage() {
                         </View>
                         {/* Register */}
                         <View style={styles.login}>
-                            <Text>Register Placeholder</Text>
                             <Text style={styles.inputBoxText}>
                                 Username:</Text>
                             <TextInput 
@@ -188,7 +196,11 @@ export default function LoginPage() {
                             />
                             <Text style={styles.smallText}>
                                 {/* todo: link to login page */}
-                                Already have an account? <Text style={{textDecorationLine: 'underline'}}>Log In</Text>
+                                Already have an account? <Text
+                                    onPress={() => scrollView.current.scrollTo({x: 0})}
+                                    style={{textDecorationLine: 'underline'}}>
+                                        Log In
+                                </Text>
                             </Text>
                             <View style={styles.loginButton}>
                                 {/* todo: connect login api */}
@@ -224,21 +236,28 @@ const styles = StyleSheet.create({
         objectFit: 'fill',
         // flex: 1,
         height: '100%',
-        // width: windowWidth,
         position: 'absolute',
         tintColor: '#000'
     },
     form: {
         flex: 1,
-        minHeight: 500,
+        // minHeight: width*.7,
         marginHorizontal: '10%',
-        marginTop: '50%',
-        marginBottom: '30%',
+        marginTop: '40%',
+        marginBottom: '20%',
         backgroundColor: '#F2BD00',
         borderRadius: 30,
         alignSelf: 'center',
         alignContent: 'center',
         justifyContent: 'center',
+    },
+    formSelL: {
+        borderTopLeftRadius: 30,
+        borderBottomLeftRadius: 30
+    },
+    formSelR: {
+        borderTopRightRadius: 30,
+        borderBottomRightRadius: 30
     },
     scrollForm: {
         // flex: 2
@@ -246,7 +265,7 @@ const styles = StyleSheet.create({
     login: {
         flex: 1,
         // margin: 25,
-        width: windowWidth,
+        width: width * .8,
         alignContent: 'center',
         justifyContent: 'center'
     },

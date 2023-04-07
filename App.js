@@ -20,7 +20,9 @@ export default function App() {
                 <Stack.Screen
                     name="Map"
                     component={MapScreen}
-                    options={{title: 'Login Successful'}}
+                    options={{
+                        headerShown: false
+                    }}
                 />
             </Stack.Navigator>
         </NavigationContainer>
