@@ -5,6 +5,7 @@ import { StyleSheet, Text, View, Image, Button, TouchableOpacity } from 'react-n
 import ActionButton from 'react-native-action-button';
 import MapView, { Marker } from 'react-native-maps';
 import * as Location from 'expo-location';
+import {mapStyle} from "./mapStyle";
 
 export default function App() {
     useEffect(() => {
@@ -43,13 +44,18 @@ export default function App() {
 
     return (
         <View style={styles.container}>
-            <MapView style={styles.map}
+            <MapView
+                provider='google' 
+                style={styles.map}
                 initialRegion={{
                     latitude: 28.60160681694149,
                     longitude: -81.20044675481425,
                     latitudeDelta: 0.0200,
                     longitudeDelta: 0.0005 ,
-                  }} mapId="6a034a94ab148b12"
+                  }}
+                showsUserLocation={true}
+                followsUserLocation={true}
+                customMapStyle={mapStyle}
             >
                 <Marker coordinate={{latitude: currLocation.coords.latitude, longitude: currLocation.coords.longitude}} onPress={e => canInteract(e.nativeEvent.coordinate) ? console.log("close enough") : console.log("not close enough")}/>
                 <Marker coordinate={{latitude: 28.60160681694149, longitude: -81.20044675481425,}} onPress={e => canInteract(e.nativeEvent.coordinate) ? console.log("close enough") : console.log("not close enough")}/> 
