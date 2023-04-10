@@ -1,8 +1,10 @@
 import React from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import LoginPage from "./components/LoginPage.js";
-import MapScreen from "./components/MapScreen.js"
+import LoginPage from "./pages/LoginPage.js";
+import MapScreen from "./pages/MapScreen.js";
+import EmailVerification from "./pages/EmailVerification.js";
+import ForgotPassword from "./pages/ForgotPassword.js"
 
 const Stack = createNativeStackNavigator();
 
@@ -13,6 +15,20 @@ export default function App() {
                 <Stack.Screen
                     name="Login"
                     component={LoginPage}
+                    options={{
+                        headerShown: false
+                    }}
+                />
+                <Stack.Screen
+                    name="Email"
+                    component={EmailVerification}
+                    options={{
+                        headerShown: false
+                    }}
+                />
+                <Stack.Screen
+                    name="Password"
+                    component={ForgotPassword}
                     options={{
                         headerShown: false
                     }}

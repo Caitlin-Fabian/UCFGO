@@ -12,7 +12,7 @@ import {
     Dimensions,
     Animated
 } from 'react-native';
-import FormSelectorBtn from './FormSelectorBtn.js';
+import FormSelectorBtn from '../components/FormSelectorBtn.js';
 
 const height = Dimensions.get('window').height;
 const width = Dimensions.get('window').width;
@@ -56,7 +56,13 @@ export default function LoginPage({navigation}) {
             if(json.id != -1){
                 console.log("Log in success")
                 setLoginMessage("Logged in successfully")
-                navigation.navigate("Map") // find how to navigate to landing/map page
+
+                // if(){//isverified
+                    navigation.navigate("Map")
+                // }
+                // else{
+                //     navigation.navigate("Email")
+                // }
             }
             else{
                 console.log("Log in failed")
@@ -94,10 +100,10 @@ export default function LoginPage({navigation}) {
     }
 
     return (
-        <View style={styles.container}>
-            <ImageBackground
-                style={styles.bgImage}
-                source={require('../assets/bgcrop.jpg')}>
+        <ImageBackground
+        style={styles.bgImage}
+        source={require('../assets/bgcrop.jpg')}>
+            <View style={styles.container}>
                 <Image
                     style={styles.logo}
                     source={require('../assets/Logo.png')}
@@ -144,6 +150,7 @@ export default function LoginPage({navigation}) {
                                 Password:</Text>
                             <TextInput 
                                 style={styles.inputBox}
+                                secureTextEntry
                                 //value = {loginPassword}
                                 onChangeText={newText => setLoginPassword(newText)}
                             />
@@ -152,6 +159,13 @@ export default function LoginPage({navigation}) {
                                     onPress={() => scrollView.current.scrollTo({x: (width*.8)})}
                                     style={{textDecorationLine: 'underline'}}>
                                         Register
+                                    </Text>
+                            </Text>
+                            <Text style={styles.smallText}>
+                                Forgot your password? <Text 
+                                    onPress={() => navigation.navigate("Password")}
+                                    style={{textDecorationLine: 'underline'}}>
+                                        Click here
                                     </Text>
                             </Text>
                             <View style={styles.loginButton}>
@@ -214,16 +228,24 @@ export default function LoginPage({navigation}) {
                         </View>
                     </ScrollView>
                 </View>
-            </ImageBackground>
+            </View>
             <StatusBar style="auto" />
-        </View>
+        </ImageBackground>
     );
 };
 
 const styles = StyleSheet.create({
+    bgImage: {
+        objectFit: 'fill',
+        flex: 1,
+        height: '100%',
+        width: '100%',
+        position: 'absolute',
+        tintColor: '#000'
+    },
     container: {
         flex: 1,
-        // backgroundColor: '#fff',
+        backgroundColor: '#fff4',
         alignItems: 'center',
         justifyContent: 'center',
     },
@@ -232,13 +254,12 @@ const styles = StyleSheet.create({
         alignSelf: 'center',
         top: '5%'
     },
-    bgImage: {
-        objectFit: 'fill',
-        // flex: 1,
-        height: '100%',
-        position: 'absolute',
-        tintColor: '#000'
-    },
+    // bgImage: {
+    //     objectFit: 'fill',
+    //     height: '100%',
+    //     position: 'absolute',
+    //     tintColor: 'rgba(100,100,100,1)'
+    // },
     form: {
         flex: 1,
         minHeight: height*.7,
