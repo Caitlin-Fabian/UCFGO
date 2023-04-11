@@ -89,6 +89,7 @@ export default function LoginPage({navigation}) {
             if(json.error == "N/A"){
                console.log("Register success")
                setRegisterMessage("User registered successfully")
+               navigation.navigate("Email", {userEmail: registerEmail, userPassword: registerPassword})
             }
             else{
                 console.log("Register failure")
@@ -168,12 +169,11 @@ export default function LoginPage({navigation}) {
                                         Click here
                                     </Text>
                             </Text>
-                            <View style={styles.loginButton}>
-                                {/* todo: connect login api */}
-                                <Pressable onPress={onPressLogIn}>
-                                    <Text style={styles.loginButtonText}>Confirm</Text>
-                                </Pressable> 
-                            </View>
+                            <Pressable 
+                                onPress={onPressLogIn}
+                                style={styles.loginButton}>
+                                <Text style={styles.loginButtonText}>Confirm</Text> 
+                            </Pressable>
                             <Text style={styles.smallText}>
                                 {loginMessage}
                             </Text>
@@ -216,12 +216,11 @@ export default function LoginPage({navigation}) {
                                         Log In
                                 </Text>
                             </Text>
-                            <View style={styles.loginButton}>
-                                {/* todo: connect login api */}
-                                <Pressable onPress={onPressRegister}>
-                                    <Text style={styles.loginButtonText}>Confirm</Text>
-                                </Pressable> 
-                            </View>
+                            <Pressable 
+                                onPress={onPressRegister}
+                                style={styles.loginButton}>
+                                <Text style={styles.loginButtonText}>Confirm</Text> 
+                            </Pressable>
                             <Text style={styles.smallText}>
                                 {registerMessage}
                             </Text>
