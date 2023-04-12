@@ -29,6 +29,7 @@ export default function LoginPage({navigation}) {
     const [loginMessage, setLoginMessage] = useState(' ');
     const [registerMessage, setRegisterMessage] = useState(' ');
 
+   
     const animation = useRef(new Animated.Value(0)).current;
     const scrollView = useRef();
 
@@ -49,16 +50,22 @@ export default function LoginPage({navigation}) {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-            login: loginUsername,
+            username: loginUsername,
             password: loginPassword
         })
         }).then((response) => response.json()).then((json) => {
             if(json.id != -1){
                 console.log("Log in success")
+                console.log("json response:", JSON.stringify(json))
+                console.log("userID:", JSON.stringify(json.id))
+                console.log("json response:", JSON.stringify(json.Name))
                 setLoginMessage("Logged in successfully")
 
                 // if(){//isverified
-                    navigation.navigate("Map")
+                    // navigation.navigate("Map", {
+                    //     userID: (json.id),
+                    //     userName: (json.Name)
+                    // })
                 // }
                 // else{
                 //     navigation.navigate("Email")
@@ -73,28 +80,39 @@ export default function LoginPage({navigation}) {
         });
     }
     const onPressRegister = async() => {
+        var regBody = JSON.stringify({
+            name: registerName,
+            username: registerUsername,
+            password: registerPassword,
+            email: registerEmail,
+        })
+    
+        console.log("Body: ", regBody);
         await fetch('https://ucf-go.herokuapp.com/api/register', {
         method: 'POST',
         headers: {
             Accept: 'application/json',
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify({
-            username: registerUsername,
-            password: registerPassword,
-            email: registerEmail,
-            name: registerName
-        })
-        }).then((response) => response.json()).then((json) => {
-            if(json.error == "N/A"){
-               console.log("Register success")
-               setRegisterMessage("User registered successfully")
-               navigation.navigate("Email", {userEmail: registerEmail, userPassword: registerPassword})
+        body: regBody
+        }).then((response) => response.text()).then((res) => {
+            // console.log(res);
+            try {
+                json = JSON.parse(res)
+                if(json.error == "N/A"){
+                    console.log("Register success")
+                    setRegisterMessage("User registered successfully")
+                    navigation.navigate("Email", {userEmail: registerEmail})
+                 }
+                 else{
+                     console.log("Register failure")
+                     setRegisterMessage("User invalid")
+                 }
+            } catch (responseErr){
+                console.log(responseErr)
+                console.log("Heroku is down it seems")
             }
-            else{
-                console.log("Register failure")
-                setRegisterMessage("User invalid")
-            }
+            
         }).catch((error) => {
             console.error(error);
         });
@@ -209,7 +227,6 @@ export default function LoginPage({navigation}) {
                                 onChangeText={newText => setRegisterEmail(newText)}
                             />
                             <Text style={styles.smallText}>
-                                {/* todo: link to login page */}
                                 Already have an account? <Text
                                     onPress={() => scrollView.current.scrollTo({x: 0})}
                                     style={{textDecorationLine: 'underline'}}>
@@ -221,6 +238,13 @@ export default function LoginPage({navigation}) {
                                 style={styles.loginButton}>
                                 <Text style={styles.loginButtonText}>Confirm</Text> 
                             </Pressable>
+                            <Text style={styles.smallText}>
+                                Debug: go to email EmailVerification <Text
+                                    onPress={() => navigation.navigate("Email", {userEmail: registerEmail})}
+                                    style={{textDecorationLine: 'underline'}}>
+                                        HERE
+                                </Text>
+                            </Text>
                             <Text style={styles.smallText}>
                                 {registerMessage}
                             </Text>
@@ -251,7 +275,9 @@ const styles = StyleSheet.create({
     logo: {
         position: 'absolute',
         alignSelf: 'center',
-        top: '5%'
+        top: '5%',
+        height: height*.1,
+        width: height*.1
     },
     // bgImage: {
     //     objectFit: 'fill',

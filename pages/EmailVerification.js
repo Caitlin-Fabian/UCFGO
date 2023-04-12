@@ -15,7 +15,6 @@ export default function EmailVerification({route, navigation}) {
     const [emailToken, setEmailToken] = useState(' ');
     const [errorMessage, setErrorMessage] = useState(' ');
     const {userEmail} = route.params;
-    const {userPassword} = route.params;
 
     const verifyEmail = async() => {
         await fetch('https://ucf-go.herokuapp.com/api/verify', {
@@ -26,7 +25,7 @@ export default function EmailVerification({route, navigation}) {
             },
             body: JSON.stringify({
                 token: emailToken,
-                password: userPassword
+                password: null
             })
             }).then((response) => response.json()).then((json) => {
                 if(json.error == "N/A"){
@@ -45,11 +44,11 @@ export default function EmailVerification({route, navigation}) {
         source={require('../assets/bgcrop.jpg')}>
             <View style={styles.container}>
                 <View style={styles.form}>
-                    <Text>{JSON.stringify(userEmail)}</Text>
-                    {/* <TextInput
+                    <Text>Verify your email by typing the code sent to {JSON.stringify(userEmail)} below:</Text>
+                    <TextInput
                         style={styles.inputBox}
                         
-                    /> */}
+                    />
                 </View>
             </View>
         </ImageBackground>
