@@ -19,10 +19,6 @@ import Inventory from '../components/InventoryModal';
 import Settings from '../components/SettingsModal';
 
 export default function MapScreen({ route, navigation }) {
-    useEffect(() => {
-        LogBox.ignoreLogs(['Animated: `useNativeDriver`']);
-    });
-
     const { userID, Name, Score } = route.params;
     console.log(userID);
 
@@ -31,6 +27,10 @@ export default function MapScreen({ route, navigation }) {
     const [shouldShowInventory, setShouldShowInventory] = useState(false);
     const [shouldShowSettings, setShouldShowSettings] = useState(false);
     const [shouldBack, setShouldBack] = useState(false);
+    const [message, setMessage] = useState('');
+    const [userInfo, setUserInfo] = useState({});
+
+    const [token, setToken] = useState('');
     const [currLocation, setCurrLocation] = useState({
         coords: { latitude: 28.60160681694149, longitude: -81.20044675481425 },
     });
@@ -44,6 +44,53 @@ export default function MapScreen({ route, navigation }) {
         else return false;
     }
 
+    // user to retrieve user info
+    // In: UserID, jwtToken
+    // Out: everything lol
+    const getUserInfo = async () => {
+        var storage = require('../tokenStorage.js');
+        console.log(
+            storage
+                .retrieveToken()
+                .then((data) => data)
+                .then((value) => {
+                    console.log('Horrary' + value);
+                    setToken(value);
+                })
+        );
+
+        console.log('Token: ' + token);
+        let js = JSON.stringify({
+            userId: userID,
+            jwtToken: token,
+        });
+
+        await fetch('https://ucf-go.herokuapp.com/api/getUserInfo', {
+            method: 'POST',
+            headers: {
+                Accept: 'application/json',
+                'Content-Type': 'application/json',
+            },
+            body: js,
+        })
+            .then((response) => response.json())
+            .then((json) => {
+                console.log(json);
+                if (json.error) {
+                    setMessage('API IS NOT WORKING');
+                } else {
+                    console.log(json);
+                    setUserInfo(json);
+                }
+            })
+            .catch((error) => {
+                console.error(error);
+            });
+    };
+    useEffect(() => {
+        LogBox.ignoreLogs(['Animated: `useNativeDriver`']);
+    });
+
     useEffect(() => {
         (async () => {
             let { status } = await Location.requestForegroundPermissionsAsync();
@@ -55,6 +102,8 @@ export default function MapScreen({ route, navigation }) {
             let location = await Location.getCurrentPositionAsync({});
             setCurrLocation(location);
             //console.log(location)
+
+            getUserInfo();
         })();
     }, []);
 
@@ -108,7 +157,6 @@ export default function MapScreen({ route, navigation }) {
                         onPress={() => {
                             setShouldShowProfile(!shouldShowProfile);
                             setShouldShowButtons(!shouldShowButtons);
-                            console.log(shouldShowProfile);
                         }}
                     />
                 </ActionButton.Item>
@@ -137,6 +185,7 @@ export default function MapScreen({ route, navigation }) {
                 <Profile
                     setShouldShowProfile={setShouldShowProfile}
                     userID={userID}
+                    userInfo={userInfo}
                 />
             ) : null}
             {shouldShowInventory ? (
