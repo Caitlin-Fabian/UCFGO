@@ -10,12 +10,11 @@ exports.storeToken = function (tok) {
     }
 };
 exports.retrieveToken = async () => {
-    var ud;
     try {
         console.log('BOo');
         const data = await AsyncStorage.getItem('token_data');
         if (data !== null) {
-            console.log(data);
+            console.log('data' + data);
             return data;
         }
     } catch (error) {
