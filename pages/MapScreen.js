@@ -13,16 +13,17 @@ import ActionButton from 'react-native-action-button';
 import MapView, { Marker } from 'react-native-maps';
 import * as Location from 'expo-location';
 import { mapStyle } from '../styles/mapStyle';
-
+import monsters from '../components/monsters';
 import Profile from '../components/ProfileModal';
 import Inventory from '../components/InventoryModal';
 import Settings from '../components/SettingsModal';
+//import { get } from 'http';
 
 export default function MapScreen({ route, navigation }) {
     const { userID, Name, Score } = route.params;
     var storage = require('../tokenStorage.js');
 
-    console.log(userID);
+    //console.log(userID);
 
     const [shouldShowButtons, setShouldShowButtons] = useState(false);
     const [shouldShowProfile, setShouldShowProfile] = useState(false);
@@ -31,6 +32,8 @@ export default function MapScreen({ route, navigation }) {
     const [shouldBack, setShouldBack] = useState(false);
     const [message, setMessage] = useState('');
     const [userInfo, setUserInfo] = useState({});
+    const [icons, setIcons] = useState([]);
+    const [ran, setRan] = useState(false);
 
     const [token, setToken] = useState('');
     const [currLocation, setCurrLocation] = useState({
@@ -46,6 +49,25 @@ export default function MapScreen({ route, navigation }) {
         else return false;
     }
 
+
+    //creates the icons of the monster locations
+    const createIcons = async () => {
+        let locations = [];
+        //await getUserInfo();
+        //can now user userInfo.monsters for the users current monsters
+
+        for(let x=0;x<monsters.length;x++){        
+            locations.push({
+              key:monsters[x].id,
+              pos: monsters[x].pos,
+              pinColor: userInfo.monsters.includes(monsters[x].id) ? /*green*/"#00FF00" : /*red*/ "FF0000"
+            });
+            
+          }
+          setIcons(locations);
+    }
+
+    
     // user to retrieve user info
     // In: UserID, jwtToken
     // Out: everything lol
@@ -98,12 +120,20 @@ export default function MapScreen({ route, navigation }) {
             }
 
             let location = await Location.getCurrentPositionAsync({});
-            setCurrLocation(location);
-            //console.log(location)
+            await new Promise(resolve => setTimeout(resolve, 1000)).then(() => setCurrLocation(location));
         })();
+        
+    }, [currLocation]);
 
+    useEffect(() => {
         getUserInfo();
-    }, [token]);
+    }, []);
+
+    useEffect(() => {
+        if ( userInfo.monsters != null && userInfo.monsters.length !== 0) {
+            createIcons();
+        }
+    }, [userInfo.monsters]);
 
     return (
         <View style={styles.container}>
@@ -120,34 +150,25 @@ export default function MapScreen({ route, navigation }) {
                 followsUserLocation={true}
                 customMapStyle={mapStyle}
             >
-                <Marker
+                {(icons.map(marker => <Marker
                     coordinate={{
-                        latitude: currLocation.coords.latitude,
-                        longitude: currLocation.coords.longitude,
+                        latitude: marker.pos.lat,
+                        longitude: marker.pos.lng,
                     }}
+                    pinColor={marker.pinColor}
+                    key={marker.key}
                     onPress={(e) =>
                         canInteract(e.nativeEvent.coordinate)
                             ? console.log('close enough')
                             : console.log('not close enough')
                     }
-                />
-                <Marker
-                    coordinate={{
-                        latitude: 28.60160681694149,
-                        longitude: -81.20044675481425,
-                    }}
-                    onPress={(e) =>
-                        canInteract(e.nativeEvent.coordinate)
-                            ? console.log('close enough')
-                            : console.log('not close enough')
-                    }
-                />
+                />))}
             </MapView>
             <Image
                 style={styles.logoContainer}
                 source={require('../assets/Logo.png')}
             />
-            <ActionButton autoInactive="true">
+            <ActionButton autoInactive={true}>
                 <ActionButton.Item
                         onPress={() => {
                             setShouldShowProfile(!shouldShowProfile);
