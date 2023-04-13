@@ -18,6 +18,31 @@ export default function App() {
     const [shouldShowSettings, setShouldShowSettings] = useState(false);
     const [shouldBack, setShouldBack] = useState(false);
     const [currLocation, setCurrLocation] = useState({coords: {latitude: 28.60160681694149, longitude: -81.20044675481425}});
+    const [currUser, setCurrUser] = useState('642381512c80d6309009a352');
+    const monsterIds = [1, 2, 3, 4, 5, 6, 9, 10];
+    const monsterScores = [30, 25, 30, 15, 15, 15, 20, 50];
+
+    const onPressGiveMonster = async(index) => {
+        await fetch('https://ucf-go.herokuapp.com/api/giveMonster', {
+        method: 'POST',
+        headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            userId: currUser,
+            monsterId: monsterIds[index],
+            monsterScore: monsterScores[index], 
+        })
+        }).then((response) => response.json()).then((json) => {
+
+            if(json.error != 'N/A'){
+                console.log(json.error);
+            }
+        }).catch((error) => {
+            console.error(error);
+        });
+    }
 
     function canInteract(coords) {
         const distance = Math.sqrt(Math.pow(coords.latitude - currLocation.coords.latitude, 2) + Math.pow(coords.longitude - currLocation.coords.longitude, 2));
@@ -57,11 +82,11 @@ export default function App() {
                 followsUserLocation={true}
                 customMapStyle={mapStyle}
             >
-                <Marker coordinate={{latitude: currLocation.coords.latitude, longitude: currLocation.coords.longitude}} onPress={e => canInteract(e.nativeEvent.coordinate) ? console.log("close enough") : console.log("not close enough")}/>
-                <Marker coordinate={{latitude: 28.60160681694149, longitude: -81.20044675481425,}} onPress={e => canInteract(e.nativeEvent.coordinate) ? console.log("close enough") : console.log("not close enough")}/> 
+                <Marker coordinate={{latitude: currLocation.coords.latitude, longitude: currLocation.coords.longitude}} onPress={e => canInteract(e.nativeEvent.coordinate) ? onPressGiveMonster(7) : console.log("not close enough")}/>
+                <Marker coordinate={{latitude: 28.60160681694149, longitude: -81.20044675481425,}} onPress={e => canInteract(e.nativeEvent.coordinate) ? onPressGiveMonster(7) : console.log("not close enough")}/> 
             </MapView>
             <Image style={styles.logoContainer} source={require('../assets/Logo.png')}/>
-            <ActionButton autoInactive='true'>
+            <ActionButton autoInactive={true}>
                 <ActionButton.Item>
                     <Button title='profile' titleStyle onPress={() => {setShouldShowProfile(!shouldShowProfile); setShouldShowButtons(!shouldShowButtons);}} />
                 </ActionButton.Item>
