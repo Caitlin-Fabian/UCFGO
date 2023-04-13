@@ -20,6 +20,8 @@ import Settings from '../components/SettingsModal';
 
 export default function MapScreen({ route, navigation }) {
     const { userID, Name, Score } = route.params;
+    var storage = require('../tokenStorage.js');
+
     console.log(userID);
 
     const [shouldShowButtons, setShouldShowButtons] = useState(false);
@@ -48,16 +50,6 @@ export default function MapScreen({ route, navigation }) {
     // In: UserID, jwtToken
     // Out: everything lol
     const getUserInfo = async () => {
-        var storage = require('../tokenStorage.js');
-
-        storage
-            .retrieveToken()
-            .then((data) => data)
-            .then((value) => {
-                console.log('Horrary' + value);
-                setToken(value);
-            });
-
         console.log('Token: ' + token);
         let js = JSON.stringify({
             userId: userID,
@@ -88,6 +80,13 @@ export default function MapScreen({ route, navigation }) {
     };
     useEffect(() => {
         LogBox.ignoreLogs(['Animated: `useNativeDriver`']);
+        storage
+            .retrieveToken()
+            .then((data) => data)
+            .then((value) => {
+                console.log('Horrary' + value);
+                setToken(value);
+            });
     });
 
     useEffect(() => {
@@ -101,10 +100,10 @@ export default function MapScreen({ route, navigation }) {
             let location = await Location.getCurrentPositionAsync({});
             setCurrLocation(location);
             //console.log(location)
-
-            getUserInfo();
         })();
-    }, []);
+
+        getUserInfo();
+    }, [token]);
 
     return (
         <View style={styles.container}>
