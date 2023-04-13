@@ -12,31 +12,28 @@ import {
 const height = Dimensions.get('window').height;
 const width = Dimensions.get('window').width;
 
-export default function ForgotPassword({route, navigation}) {
-    const [emailToken, setEmailToken] = useState(' ');
-    const [newPassword, setNewPassword] = useState(' ');
-    const [errorMessage, setErrorMessage] = useState(' ');
-    const {userEmail} = route.params;
+export default function PasswordRequest({navigation}) {
+    const [userEmail, setUserEmail] = useState('');
+    const [errorMessage, setErrorMessage] = useState('');
 
-    const verifyEmail = async() => {
-        await fetch('https://ucf-go.herokuapp.com/api/verify', {
+    const sendForgotPassword = async() => {
+        await fetch('https://ucf-go.herokuapp.com/api/sendForgotPassword', {
             method: 'POST',
             headers: {
                 Accept: 'application/json',
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                token: emailToken,
-                password: newPassword
+                email: userEmail
             })
             }).then((response) => response.json()).then((json) => {
                 if(json.error == 'N/A'){
-                    setErrorMessage('Password changed successfully')
-                    console.log('Password change success')
-                    navigation.navigate('Login')
+                    console.log('Password Request Success')
+                    // setErrorMessage('')
+                    navigation.navigate('Password', {userEmail: userEmail})
                 }
                 else{
-                    console.log('Password change error')
+                    console.log('Password Request error')
                     setErrorMessage(json.error)
                 }
             }).catch((error) => {
@@ -50,25 +47,16 @@ export default function ForgotPassword({route, navigation}) {
             <View style={styles.container}>
                 <View style={styles.form}>
                     <Text style={styles.smallText}>
-                        Type the code sent to {JSON.stringify(userEmail)} below,
-                        followed by the password you would like to reset:
+                        Forgot your password? Enter the email associated with your account below:
                     </Text>
-                    <Text style={styles.inputBoxText}>Verification Code:</Text>
                     <TextInput
                         style={styles.inputBox}
                         onChangeText={(newText) =>
-                            setEmailToken(newText)
-                        }
-                    />
-                    <Text style={styles.inputBoxText}>New Password:</Text>
-                    <TextInput
-                        style={styles.inputBox}
-                        onChangeText={(newText) =>
-                            setNewPassword(newText)
+                            setUserEmail(newText)
                         }
                     />
                     <Pressable
-                        onPress={verifyEmail}
+                        onPress={sendForgotPassword}
                         style={styles.loginButton}
                     >
                         <Text style={styles.loginButtonText}>
@@ -81,8 +69,8 @@ export default function ForgotPassword({route, navigation}) {
                 </View>
             </View>
         </ImageBackground>
-    );
-};
+    )
+}
 
 const styles = StyleSheet.create({
     bgImage: {
@@ -126,12 +114,6 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         backgroundColor: '#D9D9D9'
     },
-    inputBoxText: {
-        marginHorizontal: 10,
-        marginVertical: 3,
-        fontSize: 25,
-        fontWeight: '500',
-    },
     loginButton: {
         // width: '50%',
         margin: 20,
@@ -145,4 +127,4 @@ const styles = StyleSheet.create({
         fontSize: 20,
         fontWeight: '500',
     },
-})
+});

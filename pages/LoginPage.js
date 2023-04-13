@@ -248,7 +248,7 @@ export default function LoginPage({ navigation }) {
                                 Forgot your password?{' '}
                                 <Text
                                     onPress={() =>
-                                        navigation.navigate('Password')
+                                        navigation.navigate('Request')
                                     }
                                     style={{ textDecorationLine: 'underline' }}
                                 >
