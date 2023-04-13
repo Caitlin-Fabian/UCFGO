@@ -29,11 +29,14 @@ export default function EmailVerification({route, navigation}) {
                 password: null
             })
             }).then((response) => response.json()).then((json) => {
-                if(json.error == "N/A"){
-
+                if(json.error == 'N/A'){
+                    console.log('Verification success')
+                    setErrorMessage('Email verified successfully')
+                    navigation.navigate('Login')
                 }
                 else{
-
+                    console.log('Verification error')
+                    setErrorMessage(json.error)
                 }
             }).catch((error) => {
                 console.error(error);
@@ -46,10 +49,13 @@ export default function EmailVerification({route, navigation}) {
             <View style={styles.container}>
                 <View style={styles.form}>
                     <Text style={styles.smallText}>
-                        Verify your email by typing the code sent to {JSON.stringify(userEmail)} below:</Text>
+                        Verify your email by typing the code sent to {JSON.stringify(userEmail)} below:
+                    </Text>
                     <TextInput
                         style={styles.inputBox}
-                        
+                        onChangeText={(newText) =>
+                            setEmailToken(newText)
+                        }
                     />
                     <Pressable
                         onPress={verifyEmail}
@@ -59,6 +65,9 @@ export default function EmailVerification({route, navigation}) {
                             Confirm
                         </Text>
                     </Pressable>
+                    <Text style={styles.smallText}>
+                        {errorMessage}
+                    </Text>
                 </View>
             </View>
         </ImageBackground>
