@@ -1,13 +1,24 @@
 import { StatusBar } from 'expo-status-bar';
 import React, { useEffect, useState } from 'react';
 import { LogBox } from 'react-native';
-import { StyleSheet, Text, View, Image, Button, TouchableOpacity } from 'react-native';
+import {
+    StyleSheet,
+    Text,
+    View,
+    Image,
+    Button,
+    TouchableOpacity,
+} from 'react-native';
 import ActionButton from 'react-native-action-button';
 import MapView, { Marker } from 'react-native-maps';
 import * as Location from 'expo-location';
-import {mapStyle} from "../styles/mapStyle";
+import { mapStyle } from '../styles/mapStyle';
 
-export default function App() {
+import Profile from '../components/ProfileModal';
+import Inventory from '../components/InventoryModal';
+import Settings from '../components/SettingsModal';
+
+export default function MapScreen({ navigation }) {
     useEffect(() => {
         LogBox.ignoreLogs(['Animated: `useNativeDriver`']);
     });
@@ -17,103 +28,120 @@ export default function App() {
     const [shouldShowInventory, setShouldShowInventory] = useState(false);
     const [shouldShowSettings, setShouldShowSettings] = useState(false);
     const [shouldBack, setShouldBack] = useState(false);
-    const [currLocation, setCurrLocation] = useState({coords: {latitude: 28.60160681694149, longitude: -81.20044675481425}});
+    const [currLocation, setCurrLocation] = useState({
+        coords: { latitude: 28.60160681694149, longitude: -81.20044675481425 },
+    });
 
     function canInteract(coords) {
-        const distance = Math.sqrt(Math.pow(coords.latitude - currLocation.coords.latitude, 2) + Math.pow(coords.longitude - currLocation.coords.longitude, 2));
-        if (distance <= 0.0008)
-            return true;
-        else
-            return false;
+        const distance = Math.sqrt(
+            Math.pow(coords.latitude - currLocation.coords.latitude, 2) +
+                Math.pow(coords.longitude - currLocation.coords.longitude, 2)
+        );
+        if (distance <= 0.0008) return true;
+        else return false;
     }
 
     useEffect(() => {
         (async () => {
-          
-          let { status } = await Location.requestForegroundPermissionsAsync();
-          if (status !== 'granted') {
-            setErrorMsg('Permission to access location was denied');
-            return;
-          }
-    
-          let location = await Location.getCurrentPositionAsync({});
-          setCurrLocation(location);
-          //console.log(location)
+            let { status } = await Location.requestForegroundPermissionsAsync();
+            if (status !== 'granted') {
+                setErrorMsg('Permission to access location was denied');
+                return;
+            }
+
+            let location = await Location.getCurrentPositionAsync({});
+            setCurrLocation(location);
+            //console.log(location)
         })();
-      }, []);
+    }, []);
 
     return (
         <View style={styles.container}>
             <MapView
-                provider='google' 
+                provider="google"
                 style={styles.map}
                 initialRegion={{
                     latitude: 28.60160681694149,
                     longitude: -81.20044675481425,
-                    latitudeDelta: 0.0200,
-                    longitudeDelta: 0.0005 ,
-                  }}
+                    latitudeDelta: 0.02,
+                    longitudeDelta: 0.0005,
+                }}
                 showsUserLocation={true}
                 followsUserLocation={true}
                 customMapStyle={mapStyle}
             >
-                <Marker coordinate={{latitude: currLocation.coords.latitude, longitude: currLocation.coords.longitude}} onPress={e => canInteract(e.nativeEvent.coordinate) ? console.log("close enough") : console.log("not close enough")}/>
-                <Marker coordinate={{latitude: 28.60160681694149, longitude: -81.20044675481425,}} onPress={e => canInteract(e.nativeEvent.coordinate) ? console.log("close enough") : console.log("not close enough")}/> 
+                <Marker
+                    coordinate={{
+                        latitude: currLocation.coords.latitude,
+                        longitude: currLocation.coords.longitude,
+                    }}
+                    onPress={(e) =>
+                        canInteract(e.nativeEvent.coordinate)
+                            ? console.log('close enough')
+                            : console.log('not close enough')
+                    }
+                />
+                <Marker
+                    coordinate={{
+                        latitude: 28.60160681694149,
+                        longitude: -81.20044675481425,
+                    }}
+                    onPress={(e) =>
+                        canInteract(e.nativeEvent.coordinate)
+                            ? console.log('close enough')
+                            : console.log('not close enough')
+                    }
+                />
             </MapView>
-            <Image style={styles.logoContainer} source={require('../assets/Logo.png')}/>
-            <ActionButton autoInactive='true'>
+            <Image
+                style={styles.logoContainer}
+                source={require('../assets/Logo.png')}
+            />
+            <ActionButton autoInactive="true">
                 <ActionButton.Item>
-                    <Button title='profile' titleStyle onPress={() => {setShouldShowProfile(!shouldShowProfile); setShouldShowButtons(!shouldShowButtons);}} />
+                    <Button
+                        title="profile"
+                        titleStyle
+                        onPress={() => {
+                            setShouldShowProfile(!shouldShowProfile);
+                            setShouldShowButtons(!shouldShowButtons);
+                            console.log(shouldShowProfile);
+                        }}
+                    />
                 </ActionButton.Item>
                 <ActionButton.Item>
-                    <Button title='inventory' titleStyle onPress={() => {setShouldShowInventory(!shouldShowInventory); setShouldShowButtons(!shouldShowButtons);}}/>                    
+                    <Button
+                        title="inventory"
+                        titleStyle
+                        onPress={() => {
+                            setShouldShowInventory(!shouldShowInventory);
+                            setShouldShowButtons(!shouldShowButtons);
+                        }}
+                    />
                 </ActionButton.Item>
                 <ActionButton.Item>
-                    <Button title='settings' titleStyle onPress={() => {setShouldShowSettings(!shouldShowSettings); setShouldShowButtons(!shouldShowButtons);}}/>
+                    <Button
+                        title="settings"
+                        titleStyle
+                        onPress={() => {
+                            setShouldShowSettings(!shouldShowSettings);
+                            setShouldShowButtons(!shouldShowButtons);
+                        }}
+                    />
                 </ActionButton.Item>
             </ActionButton>
-            {shouldShowProfile ? 
-                <View style={styles.greyOverlay}>
-                    <View style={styles.headerContainer}>
-                        <Image style={styles.logoContainer} source={require('../assets/Logo.png')} />
-                        <TouchableOpacity style={styles.backButtonContainer} activeOpacity={0.2} onPress={() => setShouldShowProfile(!shouldShowProfile)}>
-                            <Image style={styles.backButton} source={require('../assets/BackButton.png')} />
-                        </TouchableOpacity>
-                        <Text style={styles.titleTxt}>PROFILE</Text>
-                        <View style={styles.profilePicContainer}></View>
-                        <View style={styles.profileInfoContainter}></View>
-                    </View>
-                </View>
-            : null}
-            {shouldShowInventory ? 
-                <View style={styles.greyOverlay}>
-                    <View style={styles.headerContainer}>
-                        <Image style={styles.logoContainer} source={require('../assets/Logo.png')} />
-                        <TouchableOpacity style={styles.backButtonContainer} activeOpacity={0.2} onPress={() => setShouldShowInventory(!shouldShowInventory)}>
-                            <Image style={styles.backButton} source={require('../assets/BackButton.png')} />
-                        </TouchableOpacity>
-                        <Text style={styles.titleTxt}>MONSTERS</Text>
-                    </View>
-                    <View style={styles.monsterCardsContainer}>
-                        <View style={styles.monsterCard}></View>
-                        <View style={styles.monsterCard}></View>
-                        <View style={styles.monsterCard}></View>
-                    </View>
-                </View>
-            : null}
-            {shouldShowSettings ? 
-                <View style={styles.greyOverlay}>
-                    <View style={styles.headerContainer}>
-                        <Image style={styles.logoContainer} source={require('../assets/Logo.png')} />
-                        <TouchableOpacity style={styles.backButtonContainer} activeOpacity={0.2} onPress={() => setShouldShowSettings(!shouldShowSettings)}>
-                            <Image style={styles.backButton} source={require('../assets/BackButton.png')} />
-                        </TouchableOpacity>
-                        <Text style={styles.titleTxt}>SETTINGS</Text>
-                    </View>
-                    <View style={styles.changePasswordContainer}><Text style={{fontWeight: 'bold', fontSize: 20}}>CHANGE PASSWORD</Text></View>
-                    <View style={styles.signOutContainer}><Text style={{fontWeight: 'bold', fontSize: 20}}>SIGN OUT</Text></View>
-                </View>
-            : null}
+            {shouldShowProfile ? (
+                <Profile setShouldShowProfile={setShouldShowProfile} />
+            ) : null}
+            {shouldShowInventory ? (
+                <Inventory setShouldShowInventory={setShouldShowInventory} />
+            ) : null}
+            {shouldShowSettings ? (
+                <Settings
+                    setShouldShowSettings={setShouldShowSettings}
+                    navigation={navigation}
+                />
+            ) : null}
             <StatusBar style="auto" />
         </View>
     );
@@ -136,7 +164,7 @@ const styles = StyleSheet.create({
     buttonsContainer: {
         position: 'absolute',
         bottom: 0,
-        right: 0
+        right: 0,
     },
     profileButton: {
         height: 90,
@@ -175,18 +203,18 @@ const styles = StyleSheet.create({
         position: 'absolute',
         backgroundColor: 'rgba(70, 70, 70, 0.8)',
         height: '100%',
-        width: '100%'
+        width: '100%',
     },
     backButtonContainer: {
         position: 'absolute',
         height: '5%',
         height: '5%',
         top: 65,
-        left: 25
+        left: 25,
     },
     backButton: {
         height: 35,
-        width: 35
+        width: 35,
     },
     headerContainer: {
         position: 'absolute',
@@ -200,7 +228,7 @@ const styles = StyleSheet.create({
         top: 130,
         alignSelf: 'center',
         fontWeight: 'bold',
-        fontSize: 40
+        fontSize: 40,
     },
     profilePicContainer: {
         position: 'absolute',
@@ -209,7 +237,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#fff',
         borderRadius: 25,
         height: 250,
-        width: 250
+        width: 250,
     },
     profileInfoContainter: {
         position: 'absolute',
@@ -218,7 +246,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#fff',
         borderRadius: 25,
         height: 300,
-        width: 350
+        width: 350,
     },
     monsterCardsContainer: {
         position: 'absolute',
@@ -228,13 +256,13 @@ const styles = StyleSheet.create({
         width: '100%',
         alignItems: 'flex-start',
         flexDirection: 'row',
-        justifyContent: 'space-around'
+        justifyContent: 'space-around',
     },
     monsterCard: {
         backgroundColor: '#fff',
         borderRadius: 10,
         height: 100,
-        width: 100
+        width: 100,
     },
     changePasswordContainer: {
         position: 'absolute',
@@ -245,7 +273,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#fff',
         borderRadius: 10,
         justifyContent: 'center',
-        alignItems: 'center'
+        alignItems: 'center',
     },
     signOutContainer: {
         position: 'absolute',
@@ -256,10 +284,10 @@ const styles = StyleSheet.create({
         backgroundColor: '#fff',
         borderRadius: 10,
         justifyContent: 'center',
-        alignItems: 'center'
+        alignItems: 'center',
     },
     map: {
         width: '100%',
-        height: '100%'
-    }
+        height: '100%',
+    },
 });
