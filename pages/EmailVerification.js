@@ -5,7 +5,8 @@ import {
   Text,
   TextInput,
   ImageBackground,
-  Dimensions
+  Dimensions,
+  Pressable
 } from 'react-native';
 
 const height = Dimensions.get('window').height;
@@ -44,11 +45,20 @@ export default function EmailVerification({route, navigation}) {
         source={require('../assets/bgcrop.jpg')}>
             <View style={styles.container}>
                 <View style={styles.form}>
-                    <Text>Verify your email by typing the code sent to {JSON.stringify(userEmail)} below:</Text>
+                    <Text style={styles.smallText}>
+                        Verify your email by typing the code sent to {JSON.stringify(userEmail)} below:</Text>
                     <TextInput
                         style={styles.inputBox}
                         
                     />
+                    <Pressable
+                        onPress={verifyEmail}
+                        style={styles.loginButton}
+                    >
+                        <Text style={styles.loginButtonText}>
+                            Confirm
+                        </Text>
+                    </Pressable>
                 </View>
             </View>
         </ImageBackground>
@@ -72,8 +82,8 @@ const styles = StyleSheet.create({
     },
     form: {
         // flex: 1,
-        minHeight: height*.5,
-        minWidth: width*.8,
+        height: height * 0.5,
+        width: width * 0.8,
         // marginHorizontal: '10%',
         // marginTop: '40%',
         // marginBottom: '20%',
@@ -83,13 +93,31 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
     },
+    smallText: {
+        fontSize: 20,
+        textAlign: 'center',
+    },
     inputBox: {
         height: 40,
-        marginHorizontal: 10,
-        marginBottom: 10,
+        width: width * 0.7,
+        // marginHorizontal: 10,
+        marginTop: 20,
         padding: 10,
         borderRadius: 30,
         borderWidth: 1,
         backgroundColor: '#D9D9D9'
+    },
+    loginButton: {
+        // width: '50%',
+        margin: 20,
+        padding: 10,
+        // alignSelf: 'center',
+        // justifyContent: 'center',
+        borderRadius: 30,
+        backgroundColor: '#D9D9D9',
+    },
+    loginButtonText: {
+        fontSize: 20,
+        fontWeight: '500',
     },
 })
