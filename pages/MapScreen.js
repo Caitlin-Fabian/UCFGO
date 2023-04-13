@@ -22,7 +22,7 @@ export default function MapScreen({ route, navigation }) {
     const { userID, Name, Score } = route.params;
     var storage = require('../tokenStorage.js');
 
-    console.log(userID);
+    //console.log(userID);
 
     const [shouldShowButtons, setShouldShowButtons] = useState(false);
     const [shouldShowProfile, setShouldShowProfile] = useState(false);
@@ -49,7 +49,7 @@ export default function MapScreen({ route, navigation }) {
         }).then((response) => response.json()).then((json) => {
 
             if(json.error != 'N/A'){
-                console.log(json.error);
+                //console.log(json.error);
             }
         }).catch((error) => {
             console.error(error);
@@ -73,7 +73,7 @@ export default function MapScreen({ route, navigation }) {
     // In: UserID, jwtToken
     // Out: everything lol
     const getUserInfo = async () => {
-        console.log('Token: ' + token);
+        //console.log('Token: ' + token);
         let js = JSON.stringify({
             userId: userID,
             jwtToken: token,
@@ -89,16 +89,16 @@ export default function MapScreen({ route, navigation }) {
         })
             .then((response) => response.json())
             .then((json) => {
-                console.log(json);
+                //console.log(json);
                 if (json.error) {
                     setMessage('API IS NOT WORKING');
                 } else {
-                    console.log(json);
+                    //console.log(json);
                     setUserInfo(json);
                 }
             })
             .catch((error) => {
-                console.error(error);
+                //console.error(error);
             });
     };
     useEffect(() => {
@@ -107,7 +107,7 @@ export default function MapScreen({ route, navigation }) {
             .retrieveToken()
             .then((data) => data)
             .then((value) => {
-                console.log('Horrary' + value);
+                //console.log('Horrary' + value);
                 setToken(value);
             });
     });
