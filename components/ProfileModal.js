@@ -199,6 +199,7 @@ const styles = StyleSheet.create({
         height: 300,
         width: 350,
     },
+    profileInfoText: { marginTop: 10, fontWeight: 'bold', fontSize: 20 },
     monsterCardsContainer: {
         position: 'absolute',
         top: 220,
