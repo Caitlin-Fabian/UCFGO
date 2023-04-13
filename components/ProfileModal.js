@@ -1,6 +1,6 @@
 import { StatusBar } from 'expo-status-bar';
 import React, { useEffect, useState } from 'react';
-import { LogBox } from 'react-native';
+import { ImageBackground, LogBox } from 'react-native';
 import {
     StyleSheet,
     Text,
@@ -15,7 +15,22 @@ import * as Location from 'expo-location';
 import { mapStyle } from '../styles/mapStyle';
 
 export default function Profile({ setShouldShowProfile, userID, userInfo }) {
-    console.log('Hello' + userInfo.Name);
+    const getCharacter = () => {
+        if (userInfo.character === 2) {
+            setCharacter(true);
+        } else {
+            setCharacter(false);
+        }
+    };
+
+    const [character, setCharacter] = useState(false);
+    const [monsterLength, setMonsterLength] = useState(
+        userInfo.monsters.length
+    );
+    useEffect(() => {
+        getCharacter();
+    }, []);
+
     return (
         <View style={styles.greyOverlay}>
             <View style={styles.headerContainer}>
@@ -34,16 +49,38 @@ export default function Profile({ setShouldShowProfile, userID, userInfo }) {
                     />
                 </TouchableOpacity>
                 <Text style={styles.titleTxt}>PROFILE</Text>
-                <View style={styles.profilePicContainer}></View>
-                <View style={styles.profileInfoContainter}>
+
+                <ImageBackground
+                    imageStyle={{ borderRadius: 25 }}
+                    style={styles.profilePicContainer}
+                    source={require('../assets/pokemon-background.jpg')}
+                >
+                    {character ? (
+                        <Image
+                            style={styles.profilePicImage}
+                            source={require('../assets/girl.png')}
+                        ></Image>
+                    ) : (
+                        <Image
+                            style={styles.profilePicImage}
+                            source={require('../assets/boy.png')}
+                        ></Image>
+                    )}
+                </ImageBackground>
+                <ImageBackground
+                    source={require('../assets/textBox.png')}
+                    style={styles.profileInfoContainter}
+                >
                     <Text style={styles.profileInfoText}>
                         {userInfo.username}
                     </Text>
-                    <Text style={styles.profileInfoText}>{userInfo.score}</Text>
                     <Text style={styles.profileInfoText}>
-                        {userInfo.monsters}
+                        Score: {userInfo.score}
                     </Text>
-                </View>
+                    <Text style={styles.profileInfoText}>
+                        Locations visited: {userInfo.monsters.length}
+                    </Text>
+                </ImageBackground>
             </View>
         </View>
     );
@@ -136,18 +173,29 @@ const styles = StyleSheet.create({
         position: 'absolute',
         top: 220,
         alignSelf: 'center',
+        alignItems: 'center',
         backgroundColor: '#fff',
+        justifyContent: 'center',
+        padding: 60,
         borderRadius: 25,
+        resizeMode: 'cover',
         height: 250,
         width: 250,
+    },
+    profilePicImage: {
+        objectFit: 'contain',
+        width: 250,
+        height: 250,
     },
     profileInfoContainter: {
         position: 'absolute',
         top: 500,
         alignSelf: 'center',
+        justifyContent: 'center',
         alignItems: 'center',
         backgroundColor: '#fff',
         borderRadius: 25,
+        resizeMode: 'cover',
         height: 300,
         width: 350,
     },

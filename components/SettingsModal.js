@@ -7,6 +7,7 @@ import {
     View,
     Image,
     Button,
+    Pressable,
     TouchableOpacity,
 } from 'react-native';
 import ActionButton from 'react-native-action-button';
@@ -14,9 +15,21 @@ import MapView, { Marker } from 'react-native-maps';
 import * as Location from 'expo-location';
 import { mapStyle } from '../styles/mapStyle';
 
-export default function Settings({ navigation, setShouldShowSettings }) {
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+export default function Settings({
+    navigation,
+    setShouldShowSettings,
+    userInfo,
+    TextInput,
+}) {
+    const [changeSettings, setChangeSettings] = useState(true);
+    const [name, setName] = useState('');
+    const [email, setEmail] = useState('');
+
     const doLogout = () => {
         navigation.navigate('Login');
+        AsyncStorage.removeItem('token_data');
     };
 
     console.log('hello');
@@ -39,21 +52,47 @@ export default function Settings({ navigation, setShouldShowSettings }) {
                 </TouchableOpacity>
                 <Text style={styles.titleTxt}>SETTINGS</Text>
             </View>
-            <View style={styles.changePasswordContainer}>
-                <Text style={{ fontWeight: 'bold', fontSize: 20 }}>
-                    CHANGE PASSWORD
-                </Text>
-            </View>
-            <TouchableOpacity
-                onPress={() => {
-                    doLogout();
-                }}
-                style={styles.signOutContainer}
-            >
-                <Text style={{ fontWeight: 'bold', fontSize: 20 }}>
-                    SIGN OUT
-                </Text>
-            </TouchableOpacity>
+            {changeSettings ? (
+                <>
+                    <TouchableOpacity
+                        style={styles.changePasswordContainer}
+                        onPress={() => {
+                            setChangeSettings(false);
+                        }}
+                    >
+                        <Text style={{ fontWeight: 'bold', fontSize: 20 }}>
+                            CHANGE PROFILE SETTINGS
+                        </Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                        onPress={() => {
+                            doLogout();
+                        }}
+                        style={styles.signOutContainer}
+                    >
+                        <Text style={{ fontWeight: 'bold', fontSize: 20 }}>
+                            SIGN OUT
+                        </Text>
+                    </TouchableOpacity>
+                </>
+            ) : (
+                <>
+                    <View style={styles.login}>
+                        <Text style={styles.inputBoxText}>Username:</Text>
+                        <TextInput
+                            style={styles.inputBox}
+                            onChangeText={setName}
+                            value={'palce'}
+                        />
+                        <Text style={styles.inputBoxText}>Email:</Text>
+                        <TextInput
+                            style={styles.inputBox}
+                            value={'place'}
+                            onChangeText={setEmail}
+                        />
+                    </View>
+                </>
+            )}
         </View>
     );
 }
