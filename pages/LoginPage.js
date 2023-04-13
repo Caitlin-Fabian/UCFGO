@@ -20,16 +20,16 @@ const width = Dimensions.get('window').width;
 
 export default function LoginPage({ navigation }) {
     const [message, setMessage] = useState('');
-    const [loginUsername, setLoginUsername] = useState(' ');
-    const [loginPassword, setLoginPassword] = useState(' ');
+    const [loginUsername, setLoginUsername] = useState('');
+    const [loginPassword, setLoginPassword] = useState('');
 
-    const [registerUsername, setRegisterUsername] = useState(' ');
-    const [registerPassword, setRegisterPassword] = useState(' ');
-    const [registerEmail, setRegisterEmail] = useState(' ');
-    const [registerName, setRegisterName] = useState(' ');
+    const [registerUsername, setRegisterUsername] = useState('');
+    const [registerPassword, setRegisterPassword] = useState('');
+    const [registerEmail, setRegisterEmail] = useState('');
+    const [registerName, setRegisterName] = useState('');
 
-    const [loginMessage, setLoginMessage] = useState(' ');
-    const [registerMessage, setRegisterMessage] = useState(' ');
+    const [loginMessage, setLoginMessage] = useState('');
+    const [registerMessage, setRegisterMessage] = useState('');
 
     const animation = useRef(new Animated.Value(0)).current;
     const scrollView = useRef();
@@ -62,12 +62,14 @@ export default function LoginPage({ navigation }) {
             .then((json) => {
                 console.log(json);
                 if (json.error) {
-                    setMessage('User/Password combination incorrect');
+                    setLoginMessage('User/Password combination incorrect');
                 } else {
                     var ud;
                     console.log('Success');
                     storage.storeToken(json);
                     console.log('Im here now');
+                    setLoginUsername('');
+                    setLoginPassword('');
                     storage
                         .retrieveToken()
                         .then((data) => data)
@@ -131,17 +133,22 @@ export default function LoginPage({ navigation }) {
                     json = JSON.parse(res);
                     if (json.error == 'N/A') {
                         console.log('Register success');
+                        var emailJson = {
+                            userEmail: registerEmail
+                        }
                         setRegisterMessage('User registered successfully');
-                        navigation.navigate('Email', {
-                            userEmail: registerEmail,
-                        });
+                        setRegisterUsername('');
+                        setRegisterPassword('');
+                        setRegisterName('');
+                        setRegisterEmail('');
+                        navigation.navigate('Email', emailJson);
                     } else {
                         console.log('Register failure');
                         setRegisterMessage('User invalid');
                     }
                 } catch (responseErr) {
                     console.log(responseErr);
-                    console.log('Heroku is down it seems');
+                    setRegisterMessage('Something went wrong, try again later');
                 }
             })
             .catch((error) => {
@@ -204,7 +211,7 @@ export default function LoginPage({ navigation }) {
                             <Text style={styles.inputBoxText}>Username:</Text>
                             <TextInput
                                 style={styles.inputBox}
-                                //value = {loginUsername}
+                                value = {loginUsername}
                                 onChangeText={(newText) =>
                                     setLoginUsername(newText)
                                 }
@@ -213,7 +220,7 @@ export default function LoginPage({ navigation }) {
                             <TextInput
                                 style={styles.inputBox}
                                 secureTextEntry
-                                //value = {loginPassword}
+                                value = {loginPassword}
                                 onChangeText={(newText) =>
                                     setLoginPassword(newText)
                                 }
@@ -257,7 +264,7 @@ export default function LoginPage({ navigation }) {
                             <Text style={styles.inputBoxText}>Username:</Text>
                             <TextInput
                                 style={styles.inputBox}
-                                //value={registerUsername}
+                                value={registerUsername}
                                 onChangeText={(newText) =>
                                     setRegisterUsername(newText)
                                 }
@@ -265,7 +272,8 @@ export default function LoginPage({ navigation }) {
                             <Text style={styles.inputBoxText}>Password:</Text>
                             <TextInput
                                 style={styles.inputBox}
-                                //value={registerPassword}
+                                secureTextEntry
+                                value={registerPassword}
                                 onChangeText={(newText) =>
                                     setRegisterPassword(newText)
                                 }
@@ -273,7 +281,7 @@ export default function LoginPage({ navigation }) {
                             <Text style={styles.inputBoxText}>Name:</Text>
                             <TextInput
                                 style={styles.inputBox}
-                                //value={registerName}
+                                value={registerName}
                                 onChangeText={(newText) =>
                                     setRegisterName(newText)
                                 }
@@ -281,7 +289,7 @@ export default function LoginPage({ navigation }) {
                             <Text style={styles.inputBoxText}>Email:</Text>
                             <TextInput
                                 style={styles.inputBox}
-                                //value={registerEmail}
+                                value={registerEmail}
                                 onChangeText={(newText) =>
                                     setRegisterEmail(newText)
                                 }
