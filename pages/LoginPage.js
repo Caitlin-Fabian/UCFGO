@@ -62,10 +62,15 @@ export default function LoginPage({ navigation }) {
                     console.log('json response:', JSON.stringify(json.Name));
                     setLoginMessage('Logged in successfully');
 
-                    navigation.navigate('Map', {
-                        userID: json.id,
-                        userName: json.Name,
-                    });
+                    // if(){//isverified
+                    // navigation.navigate("Map", {
+                    //     userID: (json.id),
+                    //     userName: (json.Name)
+                    // })
+                    // }
+                    // else{
+                    //     navigation.navigate("Email")
+                    // }
                 } else {
                     console.log('Log in failed');
                     setLoginMessage('Username or password incorrect');
