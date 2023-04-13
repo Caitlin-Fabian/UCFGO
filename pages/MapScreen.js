@@ -18,10 +18,13 @@ import Profile from '../components/ProfileModal';
 import Inventory from '../components/InventoryModal';
 import Settings from '../components/SettingsModal';
 
-export default function MapScreen({ navigation }) {
+export default function MapScreen({ route, navigation }) {
     useEffect(() => {
         LogBox.ignoreLogs(['Animated: `useNativeDriver`']);
     });
+
+    const { userID, Name, Score } = route.params;
+    console.log(userID);
 
     const [shouldShowButtons, setShouldShowButtons] = useState(false);
     const [shouldShowProfile, setShouldShowProfile] = useState(false);
@@ -131,7 +134,10 @@ export default function MapScreen({ navigation }) {
                 </ActionButton.Item>
             </ActionButton>
             {shouldShowProfile ? (
-                <Profile setShouldShowProfile={setShouldShowProfile} />
+                <Profile
+                    setShouldShowProfile={setShouldShowProfile}
+                    userID={userID}
+                />
             ) : null}
             {shouldShowInventory ? (
                 <Inventory setShouldShowInventory={setShouldShowInventory} />
