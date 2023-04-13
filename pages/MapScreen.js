@@ -83,7 +83,8 @@ export default function App() {
                 customMapStyle={mapStyle}
             >
                 <Marker coordinate={{latitude: currLocation.coords.latitude, longitude: currLocation.coords.longitude}} onPress={e => canInteract(e.nativeEvent.coordinate) ? onPressGiveMonster(7) : console.log("not close enough")}/>
-                <Marker coordinate={{latitude: 28.60160681694149, longitude: -81.20044675481425,}} onPress={e => canInteract(e.nativeEvent.coordinate) ? onPressGiveMonster(7) : console.log("not close enough")}/> 
+                <Marker coordinate={{latitude: 28.60160681694149, longitude: -81.20044675481425,}} onPress={e => canInteract(e.nativeEvent.coordinate) ? onPressGiveMonster(7) : console.log("not close enough")}/>
+                <Marker coordinate={{latitude: 28.601361, longitude: -81.200139,}} onPress={e => canInteract(e.nativeEvent.coordinate) ? onPressGiveMonster(4) : console.log("not close enough")}/> 
             </MapView>
             <Image style={styles.logoContainer} source={require('../assets/Logo.png')}/>
             <ActionButton autoInactive={true}>
