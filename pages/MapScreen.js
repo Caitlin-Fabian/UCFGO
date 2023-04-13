@@ -150,35 +150,29 @@ export default function MapScreen({ route, navigation }) {
                 source={require('../assets/Logo.png')}
             />
             <ActionButton autoInactive="true">
-                <ActionButton.Item>
-                    <Button
-                        title="profile"
-                        titleStyle
-                        onPress={() => {
-                            setShouldShowProfile(!shouldShowProfile);
-                            setShouldShowButtons(!shouldShowButtons);
-                        }}
-                    />
+                <ActionButton.Item
+                    onPress={() => {
+                        setShouldShowProfile(!shouldShowProfile);
+                        setShouldShowButtons(!shouldShowButtons);
+                    }}
+                >
+                    <Text style={styles.opTxt}>profile</Text>
                 </ActionButton.Item>
-                <ActionButton.Item>
-                    <Button
-                        title="inventory"
-                        titleStyle
-                        onPress={() => {
-                            setShouldShowInventory(!shouldShowInventory);
-                            setShouldShowButtons(!shouldShowButtons);
-                        }}
-                    />
+                <ActionButton.Item
+                    onPress={() => {
+                        setShouldShowInventory(!shouldShowInventory);
+                        setShouldShowButtons(!shouldShowButtons);
+                    }}
+                >
+                    <Text style={styles.opTxt}>inventory</Text>
                 </ActionButton.Item>
-                <ActionButton.Item>
-                    <Button
-                        title="settings"
-                        titleStyle
-                        onPress={() => {
-                            setShouldShowSettings(!shouldShowSettings);
-                            setShouldShowButtons(!shouldShowButtons);
-                        }}
-                    />
+                <ActionButton.Item
+                    onPress={() => {
+                        setShouldShowSettings(!shouldShowProfile);
+                        setShouldShowButtons(!shouldShowButtons);
+                    }}
+                >
+                    <Text style={styles.opTxt}>settings</Text>
                 </ActionButton.Item>
             </ActionButton>
             {shouldShowProfile ? (
@@ -189,12 +183,16 @@ export default function MapScreen({ route, navigation }) {
                 />
             ) : null}
             {shouldShowInventory ? (
-                <Inventory setShouldShowInventory={setShouldShowInventory} />
+                <Inventory
+                    setShouldShowInventory={setShouldShowInventory}
+                    userInfo={userInfo}
+                />
             ) : null}
             {shouldShowSettings ? (
                 <Settings
                     setShouldShowSettings={setShouldShowSettings}
                     navigation={navigation}
+                    userInfo={userInfo}
                 />
             ) : null}
             <StatusBar style="auto" />
@@ -284,6 +282,12 @@ const styles = StyleSheet.create({
         alignSelf: 'center',
         fontWeight: 'bold',
         fontSize: 40,
+    },
+    opTxt: {
+        color: '#FFFFFF',
+        alignSelf: 'center',
+        fontWeight: 'bold',
+        fontSize: 12,
     },
     profilePicContainer: {
         position: 'absolute',
