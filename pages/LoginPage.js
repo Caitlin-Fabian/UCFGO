@@ -13,11 +13,13 @@ import {
     Animated,
 } from 'react-native';
 import FormSelectorBtn from '../components/FormSelectorBtn.js';
+import jwt_decode from 'jwt-decode';
 
 const height = Dimensions.get('window').height;
 const width = Dimensions.get('window').width;
 
 export default function LoginPage({ navigation }) {
+    const [message, setMessage] = useState('');
     const [loginUsername, setLoginUsername] = useState(' ');
     const [loginPassword, setLoginPassword] = useState(' ');
 
@@ -31,6 +33,8 @@ export default function LoginPage({ navigation }) {
 
     const animation = useRef(new Animated.Value(0)).current;
     const scrollView = useRef();
+    var storage = require('../tokenStorage.js');
+    var jwtDecode = require('jwt-decode');
 
     const interpolateL = animation.interpolate({
         inputRange: [0, width * 0.8],
@@ -42,39 +46,62 @@ export default function LoginPage({ navigation }) {
     });
 
     const onPressLogIn = async () => {
+        let js = JSON.stringify({
+            username: loginUsername,
+            password: loginPassword,
+        });
         await fetch('https://ucf-go.herokuapp.com/api/login', {
             method: 'POST',
             headers: {
                 Accept: 'application/json',
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({
-                username: loginUsername,
-                password: loginPassword,
-            }),
+            body: js,
         })
             .then((response) => response.json())
             .then((json) => {
-                if (json.id != -1) {
-                    console.log('Log in success');
-                    console.log('json response:', JSON.stringify(json));
-                    console.log('userID:', JSON.stringify(json.id));
-                    console.log('json response:', JSON.stringify(json.Name));
-                    setLoginMessage('Logged in successfully');
-
-                    // if(){//isverified
-                    // navigation.navigate("Map", {
-                    //     userID: (json.id),
-                    //     userName: (json.Name)
-                    // })
-                    // }
-                    // else{
-                    //     navigation.navigate("Email")
-                    // }
+                console.log(json);
+                if (json.error) {
+                    setMessage('User/Password combination incorrect');
                 } else {
-                    console.log('Log in failed');
-                    setLoginMessage('Username or password incorrect');
+                    var ud;
+                    console.log('Success');
+                    storage.storeToken(json);
+                    console.log('Im here now');
+                    storage
+                        .retrieveToken()
+                        .then((data) => data)
+                        .then((value) => {
+                            console.log('Horrary' + value);
+                            ud = jwt_decode(value);
+                            console.log(ud);
+                            navigation.navigate('Map', {
+                                userID: ud.userID,
+                                Name: ud.Name,
+                                score: ud.Score,
+                            });
+                        });
                 }
+                // if (json.id != -1) {
+                //     console.log('Log in success');
+                //     console.log('json response:', JSON.stringify(json));
+                //     console.log('userID:', JSON.stringify(json.id));
+                //     console.log('json response:', JSON.stringify(json.Name));
+                //     setLoginMessage('Logged in successfully');
+
+                //     // if(){//isverified
+                //     // navigation.navigate("Map", {
+                //     //     userID: (json.id),
+                //     //     userName: (json.Name)
+                //     // })
+                //     // }
+                //     // else{
+                //     //     navigation.navigate("Email")
+                //     // }
+                // } else {
+                //     console.log('Log in failed');
+                //     setLoginMessage('Username or password incorrect');
+                // }
             })
             .catch((error) => {
                 console.error(error);
