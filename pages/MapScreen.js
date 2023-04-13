@@ -122,7 +122,6 @@ export default function MapScreen({ route, navigation }) {
 
             let location = await Location.getCurrentPositionAsync({});
             setCurrLocation(location);
-            //console.log(location)
         })();
         getUserInfo();
       }, [currLocation, token]);
