@@ -44,6 +44,52 @@ export default function MapScreen({ route, navigation }) {
         else return false;
     }
 
+    // user to retrieve user info
+    // In: UserID, jwtToken
+    // Out: everything lol
+    const getUserInfo = async () => {
+        var storage = require('../tokenStorage.js');
+
+        storage
+            .retrieveToken()
+            .then((data) => data)
+            .then((value) => {
+                console.log('Horrary' + value);
+                setToken(value);
+            });
+
+        console.log('Token: ' + token);
+        let js = JSON.stringify({
+            userId: userID,
+            jwtToken: token,
+        });
+
+        await fetch('https://ucf-go.herokuapp.com/api/getUserInfo', {
+            method: 'POST',
+            headers: {
+                Accept: 'application/json',
+                'Content-Type': 'application/json',
+            },
+            body: js,
+        })
+            .then((response) => response.json())
+            .then((json) => {
+                console.log(json);
+                if (json.error) {
+                    setMessage('API IS NOT WORKING');
+                } else {
+                    console.log(json);
+                    setUserInfo(json);
+                }
+            })
+            .catch((error) => {
+                console.error(error);
+            });
+    };
+    useEffect(() => {
+        LogBox.ignoreLogs(['Animated: `useNativeDriver`']);
+    });
+
     useEffect(() => {
         (async () => {
             let { status } = await Location.requestForegroundPermissionsAsync();
