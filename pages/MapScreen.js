@@ -30,7 +30,7 @@ export default function MapScreen({ route, navigation }) {
     const [shouldShowSettings, setShouldShowSettings] = useState(false);
     const [shouldBack, setShouldBack] = useState(false);
     const [currLocation, setCurrLocation] = useState({coords: {latitude: 28.60160681694149, longitude: -81.20044675481425}});
-    const [currUser, setCurrUser] = useState('642381512c80d6309009a352');
+    const [currUser, setCurrUser] = useState(userID);
     const monsterIds = [1, 2, 3, 4, 5, 6, 9, 10];
     const monsterScores = [30, 25, 30, 15, 15, 15, 20, 50];
 
