@@ -19,11 +19,9 @@ import Inventory from '../components/InventoryModal';
 import Settings from '../components/SettingsModal';
 
 export default function MapScreen({ route, navigation }) {
-    useEffect(() => {
-        LogBox.ignoreLogs(['Animated: `useNativeDriver`']);
-    });
-
     const { userID, Name, Score } = route.params;
+    var storage = require('../tokenStorage.js');
+
     console.log(userID);
 
     const [shouldShowButtons, setShouldShowButtons] = useState(false);
@@ -31,6 +29,10 @@ export default function MapScreen({ route, navigation }) {
     const [shouldShowInventory, setShouldShowInventory] = useState(false);
     const [shouldShowSettings, setShouldShowSettings] = useState(false);
     const [shouldBack, setShouldBack] = useState(false);
+    const [message, setMessage] = useState('');
+    const [userInfo, setUserInfo] = useState({});
+
+    const [token, setToken] = useState('');
     const [currLocation, setCurrLocation] = useState({
         coords: { latitude: 28.60160681694149, longitude: -81.20044675481425 },
     });
@@ -44,6 +46,49 @@ export default function MapScreen({ route, navigation }) {
         else return false;
     }
 
+    // user to retrieve user info
+    // In: UserID, jwtToken
+    // Out: everything lol
+    const getUserInfo = async () => {
+        console.log('Token: ' + token);
+        let js = JSON.stringify({
+            userId: userID,
+            jwtToken: token,
+        });
+
+        await fetch('https://ucf-go.herokuapp.com/api/getUserInfo', {
+            method: 'POST',
+            headers: {
+                Accept: 'application/json',
+                'Content-Type': 'application/json',
+            },
+            body: js,
+        })
+            .then((response) => response.json())
+            .then((json) => {
+                console.log(json);
+                if (json.error) {
+                    setMessage('API IS NOT WORKING');
+                } else {
+                    console.log(json);
+                    setUserInfo(json);
+                }
+            })
+            .catch((error) => {
+                console.error(error);
+            });
+    };
+    useEffect(() => {
+        LogBox.ignoreLogs(['Animated: `useNativeDriver`']);
+        storage
+            .retrieveToken()
+            .then((data) => data)
+            .then((value) => {
+                console.log('Horrary' + value);
+                setToken(value);
+            });
+    });
+
     useEffect(() => {
         (async () => {
             let { status } = await Location.requestForegroundPermissionsAsync();
@@ -56,7 +101,9 @@ export default function MapScreen({ route, navigation }) {
             setCurrLocation(location);
             //console.log(location)
         })();
-    }, []);
+
+        getUserInfo();
+    }, [token]);
 
     return (
         <View style={styles.container}>
@@ -101,42 +148,33 @@ export default function MapScreen({ route, navigation }) {
                 source={require('../assets/Logo.png')}
             />
             <ActionButton autoInactive="true">
-                <ActionButton.Item>
-                    <Button
-                        title="profile"
-                        titleStyle
+                <ActionButton.Item
                         onPress={() => {
                             setShouldShowProfile(!shouldShowProfile);
                             setShouldShowButtons(!shouldShowButtons);
-                            console.log(shouldShowProfile);
-                        }}
-                    />
+                        }}>
+                     <Text style={styles.opTxt}>profile</Text>
                 </ActionButton.Item>
-                <ActionButton.Item>
-                    <Button
-                        title="inventory"
-                        titleStyle
+                <ActionButton.Item
                         onPress={() => {
                             setShouldShowInventory(!shouldShowInventory);
                             setShouldShowButtons(!shouldShowButtons);
-                        }}
-                    />
+                        }}>
+                     <Text style={styles.opTxt}>inventory</Text>
                 </ActionButton.Item>
-                <ActionButton.Item>
-                    <Button
-                        title="settings"
-                        titleStyle
+                <ActionButton.Item
                         onPress={() => {
-                            setShouldShowSettings(!shouldShowSettings);
+                            setShouldShowSettings(!shouldShowProfile);
                             setShouldShowButtons(!shouldShowButtons);
-                        }}
-                    />
+                        }}>
+                    <Text style={styles.opTxt}>settings</Text>
                 </ActionButton.Item>
             </ActionButton>
             {shouldShowProfile ? (
                 <Profile
                     setShouldShowProfile={setShouldShowProfile}
                     userID={userID}
+                    userInfo={userInfo}
                 />
             ) : null}
             {shouldShowInventory ? (
@@ -235,6 +273,12 @@ const styles = StyleSheet.create({
         alignSelf: 'center',
         fontWeight: 'bold',
         fontSize: 40,
+    },
+    opTxt: {
+        color:"#FFFFFF",
+        alignSelf: 'center',
+        fontWeight: 'bold',
+        fontSize: 12,
     },
     profilePicContainer: {
         position: 'absolute',

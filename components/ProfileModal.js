@@ -14,7 +14,8 @@ import MapView, { Marker } from 'react-native-maps';
 import * as Location from 'expo-location';
 import { mapStyle } from '../styles/mapStyle';
 
-export default function Profile({ setShouldShowProfile, userID }) {
+export default function Profile({ setShouldShowProfile, userID, userInfo }) {
+    console.log('Hello' + userInfo.Name);
     return (
         <View style={styles.greyOverlay}>
             <View style={styles.headerContainer}>
@@ -34,7 +35,15 @@ export default function Profile({ setShouldShowProfile, userID }) {
                 </TouchableOpacity>
                 <Text style={styles.titleTxt}>PROFILE</Text>
                 <View style={styles.profilePicContainer}></View>
-                <View style={styles.profileInfoContainter}></View>
+                <View style={styles.profileInfoContainter}>
+                    <Text style={styles.profileInfoText}>
+                        {userInfo.username}
+                    </Text>
+                    <Text style={styles.profileInfoText}>{userInfo.score}</Text>
+                    <Text style={styles.profileInfoText}>
+                        {userInfo.monsters}
+                    </Text>
+                </View>
             </View>
         </View>
     );
@@ -136,11 +145,13 @@ const styles = StyleSheet.create({
         position: 'absolute',
         top: 500,
         alignSelf: 'center',
+        alignItems: 'center',
         backgroundColor: '#fff',
         borderRadius: 25,
         height: 300,
         width: 350,
     },
+    profileInfoText: { marginTop: 10, fontWeight: 'bold', fontSize: 20 },
     monsterCardsContainer: {
         position: 'absolute',
         top: 220,
