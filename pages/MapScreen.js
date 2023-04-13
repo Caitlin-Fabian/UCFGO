@@ -19,10 +19,6 @@ import Inventory from '../components/InventoryModal';
 import Settings from '../components/SettingsModal';
 
 export default function MapScreen({ route, navigation }) {
-    useEffect(() => {
-        LogBox.ignoreLogs(['Animated: `useNativeDriver`']);
-    });
-
     const { userID, Name, Score } = route.params;
     console.log(userID);
 
@@ -31,6 +27,10 @@ export default function MapScreen({ route, navigation }) {
     const [shouldShowInventory, setShouldShowInventory] = useState(false);
     const [shouldShowSettings, setShouldShowSettings] = useState(false);
     const [shouldBack, setShouldBack] = useState(false);
+    const [message, setMessage] = useState('');
+    const [userInfo, setUserInfo] = useState({});
+
+    const [token, setToken] = useState('');
     const [currLocation, setCurrLocation] = useState({
         coords: { latitude: 28.60160681694149, longitude: -81.20044675481425 },
     });
@@ -101,6 +101,8 @@ export default function MapScreen({ route, navigation }) {
             let location = await Location.getCurrentPositionAsync({});
             setCurrLocation(location);
             //console.log(location)
+
+            getUserInfo();
         })();
     }, []);
 
@@ -154,7 +156,6 @@ export default function MapScreen({ route, navigation }) {
                         onPress={() => {
                             setShouldShowProfile(!shouldShowProfile);
                             setShouldShowButtons(!shouldShowButtons);
-                            console.log(shouldShowProfile);
                         }}
                     />
                 </ActionButton.Item>
@@ -183,6 +184,7 @@ export default function MapScreen({ route, navigation }) {
                 <Profile
                     setShouldShowProfile={setShouldShowProfile}
                     userID={userID}
+                    userInfo={userInfo}
                 />
             ) : null}
             {shouldShowInventory ? (

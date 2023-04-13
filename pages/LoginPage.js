@@ -45,6 +45,10 @@ export default function LoginPage({ navigation }) {
         outputRange: ['rgba(27,27,27,0.4)', 'rgba(27,27,27,1)'],
     });
 
+    // Login Function
+    // In: username, password
+    // Out: none
+    // AsyncStorage Name, Score, ID
     const onPressLogIn = async () => {
         let js = JSON.stringify({
             username: loginUsername,
@@ -107,6 +111,8 @@ export default function LoginPage({ navigation }) {
                 console.error(error);
             });
     };
+
+    // Register Function
     const onPressRegister = async () => {
         var regBody = JSON.stringify({
             name: registerName,

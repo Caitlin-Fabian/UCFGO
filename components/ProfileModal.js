@@ -14,7 +14,8 @@ import MapView, { Marker } from 'react-native-maps';
 import * as Location from 'expo-location';
 import { mapStyle } from '../styles/mapStyle';
 
-export default function Profile({ setShouldShowProfile, userID }) {
+export default function Profile({ setShouldShowProfile, userID, userInfo }) {
+    console.log('Hello' + userInfo.Name);
     return (
         <View style={styles.greyOverlay}>
             <View style={styles.headerContainer}>
