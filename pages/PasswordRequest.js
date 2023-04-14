@@ -12,30 +12,28 @@ import {
 const height = Dimensions.get('window').height;
 const width = Dimensions.get('window').width;
 
-export default function EmailVerification({route, navigation}) {
-    const [emailToken, setEmailToken] = useState(' ');
-    const [errorMessage, setErrorMessage] = useState(' ');
-    const {userEmail} = route.params;
+export default function PasswordRequest({navigation}) {
+    const [userEmail, setUserEmail] = useState('');
+    const [errorMessage, setErrorMessage] = useState('');
 
-    const verifyEmail = async() => {
-        await fetch('https://ucf-go.herokuapp.com/api/verify', {
+    const sendForgotPassword = async() => {
+        await fetch('https://ucf-go.herokuapp.com/api/sendForgotPassword', {
             method: 'POST',
             headers: {
                 Accept: 'application/json',
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                token: emailToken,
-                password: null
+                email: userEmail
             })
             }).then((response) => response.json()).then((json) => {
                 if(json.error == 'N/A'){
-                    console.log('Verification success')
-                    setErrorMessage('Email verified successfully')
-                    navigation.navigate('Login')
+                    console.log('Password Request Success')
+                    // setErrorMessage('')
+                    navigation.navigate('Password', {userEmail: userEmail})
                 }
                 else{
-                    console.log('Verification error')
+                    console.log('Password Request error')
                     setErrorMessage(json.error)
                 }
             }).catch((error) => {
@@ -49,16 +47,16 @@ export default function EmailVerification({route, navigation}) {
             <View style={styles.container}>
                 <View style={styles.form}>
                     <Text style={styles.smallText}>
-                        Verify your email by typing the code sent to {JSON.stringify(userEmail)} below:
+                        Forgot your password? Enter the email associated with your account below:
                     </Text>
                     <TextInput
                         style={styles.inputBox}
                         onChangeText={(newText) =>
-                            setEmailToken(newText)
+                            setUserEmail(newText)
                         }
                     />
                     <Pressable
-                        onPress={verifyEmail}
+                        onPress={sendForgotPassword}
                         style={styles.loginButton}
                     >
                         <Text style={styles.loginButtonText}>
@@ -71,8 +69,8 @@ export default function EmailVerification({route, navigation}) {
                 </View>
             </View>
         </ImageBackground>
-    );
-};
+    )
+}
 
 const styles = StyleSheet.create({
     bgImage: {
@@ -129,4 +127,4 @@ const styles = StyleSheet.create({
         fontSize: 20,
         fontWeight: '500',
     },
-})
+});
