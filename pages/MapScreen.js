@@ -17,13 +17,11 @@ import monsters from '../components/monsters';
 import Profile from '../components/ProfileModal';
 import Inventory from '../components/InventoryModal';
 import Settings from '../components/SettingsModal';
-//import { get } from 'http';
+
 
 export default function MapScreen({ route, navigation }) {
     const { userID, Name, Score } = route.params;
     var storage = require('../tokenStorage.js');
-
-    //console.log(userID);
 
     const [shouldShowButtons, setShouldShowButtons] = useState(false);
     const [shouldShowProfile, setShouldShowProfile] = useState(false);
@@ -131,8 +129,10 @@ export default function MapScreen({ route, navigation }) {
 
     useEffect(() => {
         if (userInfo.monsters != null && userInfo.monsters.length !== 0) {
+            console.log("markers online :sunglasses:")
             createIcons();
         }
+        console.log("went into markers use effect")
     }, [userInfo.monsters]);
 
     return (
@@ -206,7 +206,7 @@ export default function MapScreen({ route, navigation }) {
             {shouldShowInventory ? (
                 <Inventory
                     setShouldShowInventory={setShouldShowInventory}
-                    userInfo={userInfo}
+                   // monsterInfo = {userInfo.monsters}
                 />
             ) : null}
             {shouldShowSettings ? (

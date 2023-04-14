@@ -8,12 +8,14 @@ import {
     Image,
     TextInput,
     Pressable,
+    TouchableOpacity,
     ImageBackground,
     Dimensions,
     Animated,
 } from 'react-native';
 import FormSelectorBtn from '../components/FormSelectorBtn.js';
 import jwt_decode from 'jwt-decode';
+import ActionButton from 'react-native-action-button';
 
 const height = Dimensions.get('window').height;
 const width = Dimensions.get('window').width;
@@ -116,21 +118,21 @@ export default function LoginPage({ navigation }) {
 
     // Register Function
     const onPressRegister = async () => {
-        var regBody = JSON.stringify({
-            name: registerName,
+        let js =  JSON.stringify({
             username: registerUsername,
             password: registerPassword,
-            email: registerEmail,
+            name: registerName,
+            email:registerEmail
         });
 
-        console.log('Body: ', regBody);
+        console.log("js sent"+js);
         await fetch('https://ucf-go.herokuapp.com/api/register', {
             method: 'POST',
             headers: {
                 Accept: 'application/json',
                 'Content-Type': 'application/json',
             },
-            body: regBody,
+            body: js,
         })
             .then((response) => response.text())
             .then((res) => {
@@ -255,22 +257,23 @@ export default function LoginPage({ navigation }) {
                                     Click here
                                 </Text>
                             </Text>
-                            <Pressable
+                            <TouchableOpacity
                                 onPress={onPressLogIn}
                                 style={styles.loginButton}
                             >
                                 <Text style={styles.loginButtonText}>
                                     Confirm
                                 </Text>
-                            </Pressable>
+                            </TouchableOpacity>
                             <Text style={styles.smallText}>{loginMessage}</Text>
                         </View>
                         {/* Register */}
                         <View style={styles.login}>
+                            <ScrollView>
                             <Text style={styles.inputBoxText}>Username:</Text>
                             <TextInput
                                 style={styles.inputBox}
-                                value={registerUsername}
+                               // value={registerUsername}
                                 onChangeText={(newText) =>
                                     setRegisterUsername(newText)
                                 }
@@ -278,8 +281,7 @@ export default function LoginPage({ navigation }) {
                             <Text style={styles.inputBoxText}>Password:</Text>
                             <TextInput
                                 style={styles.inputBox}
-                                secureTextEntry
-                                value={registerPassword}
+                               // value={registerPassword}
                                 onChangeText={(newText) =>
                                     setRegisterPassword(newText)
                                 }
@@ -287,7 +289,7 @@ export default function LoginPage({ navigation }) {
                             <Text style={styles.inputBoxText}>Name:</Text>
                             <TextInput
                                 style={styles.inputBox}
-                                value={registerName}
+                              //  value={registerName}
                                 onChangeText={(newText) =>
                                     setRegisterName(newText)
                                 }
@@ -295,11 +297,12 @@ export default function LoginPage({ navigation }) {
                             <Text style={styles.inputBoxText}>Email:</Text>
                             <TextInput
                                 style={styles.inputBox}
-                                value={registerEmail}
+                               // value={registerEmail}
                                 onChangeText={(newText) =>
                                     setRegisterEmail(newText)
                                 }
                             />
+                            </ScrollView>
                             <Text style={styles.smallText}>
                                 Already have an account?{' '}
                                 <Text
@@ -311,14 +314,14 @@ export default function LoginPage({ navigation }) {
                                     Log In
                                 </Text>
                             </Text>
-                            <Pressable
+                            <TouchableOpacity
                                 onPress={onPressRegister}
                                 style={styles.loginButton}
                             >
                                 <Text style={styles.loginButtonText}>
                                     Confirm
                                 </Text>
-                            </Pressable>
+                            </TouchableOpacity>
                             <Text style={styles.smallText}>
                                 Debug: go to email EmailVerification{' '}
                                 <Text
@@ -412,8 +415,8 @@ const styles = StyleSheet.create({
         backgroundColor: '#D9D9D9',
     },
     inputBoxText: {
-        marginHorizontal: 10,
-        marginVertical: 3,
+        marginHorizontal: 7,
+        marginVertical: 2,
         fontSize: 25,
         fontWeight: '500',
     },
