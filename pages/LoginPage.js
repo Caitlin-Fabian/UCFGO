@@ -7,7 +7,6 @@ import {
     ScrollView,
     Image,
     TextInput,
-    Pressable,
     TouchableOpacity,
     ImageBackground,
     Dimensions,
@@ -119,13 +118,13 @@ export default function LoginPage({ navigation }) {
     // Register Function
     const onPressRegister = async () => {
         let js =  JSON.stringify({
+            name: registerName,
             username: registerUsername,
             password: registerPassword,
-            name: registerName,
-            email:registerEmail
+            email: registerEmail
         });
 
-        console.log("js sent"+js);
+        console.log("js sent: "+js);
         await fetch('https://ucf-go.herokuapp.com/api/register', {
             method: 'POST',
             headers: {
@@ -139,9 +138,9 @@ export default function LoginPage({ navigation }) {
                 // console.log(res);
                 try {
                     json = JSON.parse(res);
-                    if (json.error == 'N/A') {
+                    if (json.id !== -1) {
                         console.log('Register success');
-                        var emailJson = {
+                        let emailJson = {
                             userEmail: registerEmail
                         }
                         setRegisterMessage('User registered successfully');
@@ -273,7 +272,7 @@ export default function LoginPage({ navigation }) {
                             <Text style={styles.inputBoxText}>Username:</Text>
                             <TextInput
                                 style={styles.inputBox}
-                               // value={registerUsername}
+                                value={registerUsername}
                                 onChangeText={(newText) =>
                                     setRegisterUsername(newText)
                                 }
@@ -281,7 +280,7 @@ export default function LoginPage({ navigation }) {
                             <Text style={styles.inputBoxText}>Password:</Text>
                             <TextInput
                                 style={styles.inputBox}
-                               // value={registerPassword}
+                                value={registerPassword}
                                 onChangeText={(newText) =>
                                     setRegisterPassword(newText)
                                 }
@@ -289,7 +288,7 @@ export default function LoginPage({ navigation }) {
                             <Text style={styles.inputBoxText}>Name:</Text>
                             <TextInput
                                 style={styles.inputBox}
-                              //  value={registerName}
+                                value={registerName}
                                 onChangeText={(newText) =>
                                     setRegisterName(newText)
                                 }
@@ -297,7 +296,7 @@ export default function LoginPage({ navigation }) {
                             <Text style={styles.inputBoxText}>Email:</Text>
                             <TextInput
                                 style={styles.inputBox}
-                               // value={registerEmail}
+                                value={registerEmail}
                                 onChangeText={(newText) =>
                                     setRegisterEmail(newText)
                                 }
