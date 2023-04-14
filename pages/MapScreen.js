@@ -127,12 +127,14 @@ export default function MapScreen({ route, navigation }) {
 
     useEffect(() => {
         getUserInfo();
-    }, []);
+    }, [token]);
 
     useEffect(() => {
         if (userInfo.monsters != null && userInfo.monsters.length !== 0) {
+            console.log('markers online :sunglasses:');
             createIcons();
         }
+        console.log('went into markers use effect');
     }, [userInfo.monsters]);
 
     return (
@@ -206,7 +208,7 @@ export default function MapScreen({ route, navigation }) {
             {shouldShowInventory ? (
                 <Inventory
                     setShouldShowInventory={setShouldShowInventory}
-                    userInfo={userInfo}
+                    // monsterInfo = {userInfo.monsters}
                 />
             ) : null}
             {shouldShowSettings ? (
