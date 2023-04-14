@@ -9,12 +9,17 @@ import {
     Button,
     TouchableOpacity,
 } from 'react-native';
+import monsters from "./monsters";
 import ActionButton from 'react-native-action-button';
 import MapView, { Marker } from 'react-native-maps';
 import * as Location from 'expo-location';
 import { mapStyle } from '../styles/mapStyle';
+import monsterView from './monsterView';
 
-export default function Inventory({ setShouldShowInventory }) {
+export default function Inventory({ setShouldShowInventory, monsterInfo }) {
+
+
+
     console.log('hello');
     return (
         <View style={styles.greyOverlay}>
@@ -36,9 +41,18 @@ export default function Inventory({ setShouldShowInventory }) {
                 <Text style={styles.titleTxt}>INVENTORY</Text>
             </View>
             <View style={styles.monsterCardsContainer}>
-                <View style={styles.monsterCard}></View>
-                <View style={styles.monsterCard}></View>
-                <View style={styles.monsterCard}></View>
+                {monsterInfo.map((monster) => (
+                    <>
+                        <ActionButton
+                            style={styles.monsterCard}
+                            onPress={() => monsterView(monster)}
+                        >
+                            <Image source={monster.picture}/>
+                        </ActionButton>
+                    </>))
+
+                }
+
             </View>
         </View>
     );

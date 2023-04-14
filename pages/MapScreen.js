@@ -17,13 +17,10 @@ import monsters from '../components/monsters';
 import Profile from '../components/ProfileModal';
 import Inventory from '../components/InventoryModal';
 import Settings from '../components/SettingsModal';
-//import { get } from 'http';
 
 export default function MapScreen({ route, navigation }) {
     const { userID, Name, Score } = route.params;
     var storage = require('../tokenStorage.js');
-
-    //console.log(userID);
 
     const [shouldShowButtons, setShouldShowButtons] = useState(false);
     const [shouldShowProfile, setShouldShowProfile] = useState(false);
