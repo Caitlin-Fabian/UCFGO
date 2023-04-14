@@ -49,25 +49,24 @@ export default function MapScreen({ route, navigation }) {
         else return false;
     }
 
-
     //creates the icons of the monster locations
     const createIcons = async () => {
         let locations = [];
         //await getUserInfo();
         //can now user userInfo.monsters for the users current monsters
 
-        for(let x=0;x<monsters.length;x++){        
+        for (let x = 0; x < monsters.length; x++) {
             locations.push({
-              key:monsters[x].id,
-              pos: monsters[x].pos,
-              pinColor: userInfo.monsters.includes(monsters[x].id) ? /*green*/"#00FF00" : /*red*/ "FF0000"
+                key: monsters[x].id,
+                pos: monsters[x].pos,
+                pinColor: userInfo.monsters.includes(monsters[x].id)
+                    ? /*green*/ '#00FF00'
+                    : /*red*/ 'FF0000',
             });
-            
-          }
-          setIcons(locations);
-    }
+        }
+        setIcons(locations);
+    };
 
-    
     // user to retrieve user info
     // In: UserID, jwtToken
     // Out: everything lol
@@ -120,9 +119,10 @@ export default function MapScreen({ route, navigation }) {
             }
 
             let location = await Location.getCurrentPositionAsync({});
-            await new Promise(resolve => setTimeout(resolve, 1000)).then(() => setCurrLocation(location));
+            await new Promise((resolve) => setTimeout(resolve, 1000)).then(() =>
+                setCurrLocation(location)
+            );
         })();
-        
     }, [currLocation]);
 
     useEffect(() => {
@@ -130,7 +130,7 @@ export default function MapScreen({ route, navigation }) {
     }, []);
 
     useEffect(() => {
-        if ( userInfo.monsters != null && userInfo.monsters.length !== 0) {
+        if (userInfo.monsters != null && userInfo.monsters.length !== 0) {
             createIcons();
         }
     }, [userInfo.monsters]);
@@ -150,19 +150,21 @@ export default function MapScreen({ route, navigation }) {
                 followsUserLocation={true}
                 customMapStyle={mapStyle}
             >
-                {(icons.map(marker => <Marker
-                    coordinate={{
-                        latitude: marker.pos.lat,
-                        longitude: marker.pos.lng,
-                    }}
-                    pinColor={marker.pinColor}
-                    key={marker.key}
-                    onPress={(e) =>
-                        canInteract(e.nativeEvent.coordinate)
-                            ? console.log('close enough')
-                            : console.log('not close enough')
-                    }
-                />))}
+                {icons.map((marker) => (
+                    <Marker
+                        coordinate={{
+                            latitude: marker.pos.lat,
+                            longitude: marker.pos.lng,
+                        }}
+                        pinColor={marker.pinColor}
+                        key={marker.key}
+                        onPress={(e) =>
+                            canInteract(e.nativeEvent.coordinate)
+                                ? console.log('close enough')
+                                : console.log('not close enough')
+                        }
+                    />
+                ))}
             </MapView>
             <Image
                 style={styles.logoContainer}
@@ -170,24 +172,27 @@ export default function MapScreen({ route, navigation }) {
             />
             <ActionButton autoInactive={true}>
                 <ActionButton.Item
-                        onPress={() => {
-                            setShouldShowProfile(!shouldShowProfile);
-                            setShouldShowButtons(!shouldShowButtons);
-                        }}>
-                     <Text style={styles.opTxt}>profile</Text>
+                    onPress={() => {
+                        setShouldShowProfile(!shouldShowProfile);
+                        setShouldShowButtons(!shouldShowButtons);
+                    }}
+                >
+                    <Text style={styles.opTxt}>profile</Text>
                 </ActionButton.Item>
                 <ActionButton.Item
-                        onPress={() => {
-                            setShouldShowInventory(!shouldShowInventory);
-                            setShouldShowButtons(!shouldShowButtons);
-                        }}>
-                     <Text style={styles.opTxt}>inventory</Text>
+                    onPress={() => {
+                        setShouldShowInventory(!shouldShowInventory);
+                        setShouldShowButtons(!shouldShowButtons);
+                    }}
+                >
+                    <Text style={styles.opTxt}>inventory</Text>
                 </ActionButton.Item>
                 <ActionButton.Item
-                        onPress={() => {
-                            setShouldShowSettings(!shouldShowProfile);
-                            setShouldShowButtons(!shouldShowButtons);
-                        }}>
+                    onPress={() => {
+                        setShouldShowSettings(!shouldShowProfile);
+                        setShouldShowButtons(!shouldShowButtons);
+                    }}
+                >
                     <Text style={styles.opTxt}>settings</Text>
                 </ActionButton.Item>
             </ActionButton>
@@ -199,12 +204,16 @@ export default function MapScreen({ route, navigation }) {
                 />
             ) : null}
             {shouldShowInventory ? (
-                <Inventory setShouldShowInventory={setShouldShowInventory} />
+                <Inventory
+                    setShouldShowInventory={setShouldShowInventory}
+                    userInfo={userInfo}
+                />
             ) : null}
             {shouldShowSettings ? (
                 <Settings
                     setShouldShowSettings={setShouldShowSettings}
                     navigation={navigation}
+                    userInfo={userInfo}
                 />
             ) : null}
             <StatusBar style="auto" />
@@ -296,7 +305,7 @@ const styles = StyleSheet.create({
         fontSize: 40,
     },
     opTxt: {
-        color:"#FFFFFF",
+        color: '#FFFFFF',
         alignSelf: 'center',
         fontWeight: 'bold',
         fontSize: 12,
