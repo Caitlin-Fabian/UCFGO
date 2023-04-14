@@ -1,0 +1,1 @@
+// will display the monsters image as well as its description
