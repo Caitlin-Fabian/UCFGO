@@ -4,7 +4,8 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import LoginPage from "./pages/LoginPage.js";
 import MapScreen from "./pages/MapScreen.js";
 import EmailVerification from "./pages/EmailVerification.js";
-import ForgotPassword from "./pages/ForgotPassword.js"
+import PasswordRequest from "./pages/PasswordRequest.js"
+import ForgotPassword from "./pages/ForgotPassword.js";
 
 const Stack = createNativeStackNavigator();
 
@@ -22,6 +23,13 @@ export default function App() {
                 <Stack.Screen
                     name="Email"
                     component={EmailVerification}
+                    options={{
+                        headerShown: false
+                    }}
+                />
+                <Stack.Screen
+                    name="Request"
+                    component={PasswordRequest}
                     options={{
                         headerShown: false
                     }}
