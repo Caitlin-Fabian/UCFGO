@@ -24,12 +24,42 @@ export default function MapScreen({ route, navigation }) {
     const { userID, Name, Score } = route.params;
     var storage = require('../tokenStorage.js');
 
+
+    //console.log(userID);
+
+
     const [shouldShowButtons, setShouldShowButtons] = useState(false);
     const [shouldShowProfile, setShouldShowProfile] = useState(false);
     const [shouldShowInventory, setShouldShowInventory] = useState(false);
     const [shouldShowSettings, setShouldShowSettings] = useState(false);
     const [shouldShowMonster, setShouldShowMonster] = useState(false);
     const [shouldBack, setShouldBack] = useState(false);
+    const [currLocation, setCurrLocation] = useState({coords: {latitude: 28.60160681694149, longitude: -81.20044675481425}});
+    const [currUser, setCurrUser] = useState(userID);
+    const monsterIds = [1, 2, 3, 4, 5, 6, 9, 10];
+    const monsterScores = [30, 25, 30, 15, 15, 15, 20, 50];
+
+    const onPressGiveMonster = async(index) => {
+        await fetch('https://ucf-go.herokuapp.com/api/giveMonster', {
+        method: 'POST',
+        headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            userId: currUser,
+            monsterId: monsterIds[index],
+            monsterScore: monsterScores[index], 
+        })
+        }).then((response) => response.json()).then((json) => {
+
+            if(json.error != 'N/A'){
+                //console.log(json.error);
+            }
+        }).catch((error) => {
+            console.error(error);
+        });
+    }
     const [message, setMessage] = useState('');
     const [userInfo, setUserInfo] = useState({});
     const [icons, setIcons] = useState([]);
@@ -39,9 +69,6 @@ export default function MapScreen({ route, navigation }) {
     const [isInRange, setIsInRange] = useState(null)
 
     const [token, setToken] = useState('');
-    const [currLocation, setCurrLocation] = useState({
-        coords: { latitude: 28.60160681694149, longitude: -81.20044675481425 },
-    });
 
     function canInteract(coords) {
         const distance = Math.sqrt(
@@ -80,7 +107,7 @@ export default function MapScreen({ route, navigation }) {
     // In: UserID, jwtToken
     // Out: everything lol
     const getUserInfo = async () => {
-        console.log('Token: ' + token);
+        //console.log('Token: ' + token);
         let js = JSON.stringify({
             userId: userID,
             jwtToken: token,
@@ -96,16 +123,16 @@ export default function MapScreen({ route, navigation }) {
         })
             .then((response) => response.json())
             .then((json) => {
-                console.log(json);
+                //console.log(json);
                 if (json.error) {
                     setMessage('API IS NOT WORKING');
                 } else {
-                    console.log(json);
+                    //console.log(json);
                     setUserInfo(json);
                 }
             })
             .catch((error) => {
-                console.error(error);
+                //console.error(error);
             });
     };
     useEffect(() => {
@@ -114,7 +141,7 @@ export default function MapScreen({ route, navigation }) {
             .retrieveToken()
             .then((data) => data)
             .then((value) => {
-                console.log('Horrary' + value);
+                //console.log('Horrary' + value);
                 setToken(value);
             });
     });
@@ -137,7 +164,8 @@ export default function MapScreen({ route, navigation }) {
 
     useEffect(() => {
         getUserInfo();
-    }, [token]);
+      }, [currLocation, token]);
+
 
     useEffect(() => {
         if (userInfo.monsters != null && userInfo.monsters.length !== 0) {
@@ -202,8 +230,9 @@ export default function MapScreen({ route, navigation }) {
                     <Text style={styles.opTxt}>inventory</Text>
                 </ActionButton.Item>
                 <ActionButton.Item
+
                     onPress={() => {
-                        setShouldShowSettings(!shouldShowProfile);
+                        setShouldShowSettings(!shouldShowSettings);
                         setShouldShowButtons(!shouldShowButtons);
                     }}
                 >
