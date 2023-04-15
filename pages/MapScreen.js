@@ -17,6 +17,7 @@ import monsters from '../components/monsters';
 import Profile from '../components/ProfileModal';
 import Inventory from '../components/InventoryModal';
 import Settings from '../components/SettingsModal';
+import Character from '../components/Character';
 
 export default function MapScreen({ route, navigation }) {
     const { userID, Name, Score } = route.params;
@@ -26,11 +27,10 @@ export default function MapScreen({ route, navigation }) {
     const [shouldShowProfile, setShouldShowProfile] = useState(false);
     const [shouldShowInventory, setShouldShowInventory] = useState(false);
     const [shouldShowSettings, setShouldShowSettings] = useState(false);
-    const [shouldBack, setShouldBack] = useState(false);
     const [message, setMessage] = useState('');
     const [userInfo, setUserInfo] = useState({});
     const [icons, setIcons] = useState([]);
-    const [ran, setRan] = useState(false);
+    const [character, setCharacter] = useState(false);
     const [monstersOfUser, setMonstersOfUser] = useState([]);
 
     const [token, setToken] = useState('');
@@ -102,6 +102,12 @@ export default function MapScreen({ route, navigation }) {
                 console.error(error);
             });
     };
+
+    const chooseCharacter = () => {
+        if (userInfo.character == 0) {
+            setCharacter(true);
+        }
+    };
     useEffect(() => {
         LogBox.ignoreLogs(['Animated: `useNativeDriver`']);
         storage
@@ -133,10 +139,10 @@ export default function MapScreen({ route, navigation }) {
     }, [token]);
 
     useEffect(() => {
-        if (userInfo.monsters != null && userInfo.monsters.length !== 0) {
-            console.log('markers online :sunglasses:');
-            createIcons();
-        }
+        console.log('markers online :sunglasses:');
+        createIcons();
+
+        chooseCharacter();
         console.log('went into markers use effect');
     }, [userInfo.monsters]);
 
@@ -201,6 +207,12 @@ export default function MapScreen({ route, navigation }) {
                     <Text style={styles.opTxt}>settings</Text>
                 </ActionButton.Item>
             </ActionButton>
+            {character ? (
+                <Character
+                    setCharacter={setCharacter}
+                    userInfo={userInfo}
+                />
+            ) : null}
             {shouldShowProfile ? (
                 <Profile
                     setShouldShowProfile={setShouldShowProfile}

@@ -18,25 +18,31 @@ import { mapStyle } from '../styles/mapStyle';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-export default function Character({
-    navigation,
-    setChooseCharacter,
-    userInfo,
-}) {
+export default function Character({ navigation, setCharacter, userInfo }) {
     const [changeSettings, setChangeSettings] = useState(true);
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
-    const [character, setCharacter] = useState(0);
+    const [characterNumber, setCharacterNumber] = useState(0);
 
     console.log('HELLLLLLP ME');
+    const chooseMale = () => {
+        setCharacter(1);
+    };
+
+    const chooseFemale = () => {
+        setCharacter(2);
+    };
     const chooseCharacter = async () => {
-        console.log('Token: ' + token);
+        console.log(characterNumber);
         let js = JSON.stringify({
-            userId: userID,
-            jwtToken: token,
+            character: characterNumber,
+            name: null,
+            username: null,
+            userId: userInfo.id,
+            email: null,
         });
 
-        await fetch('https://ucf-go.herokuapp.com/api/getUserInfo', {
+        await fetch('https://ucf-go.herokuapp.com/api/updateUser', {
             method: 'POST',
             headers: {
                 Accept: 'application/json',
@@ -50,8 +56,7 @@ export default function Character({
                 if (json.error) {
                     setMessage('API IS NOT WORKING');
                 } else {
-                    console.log(json);
-                    setUserInfo(json);
+                    setCharacter(false);
                 }
             })
             .catch((error) => {
@@ -61,7 +66,7 @@ export default function Character({
 
     return (
         <View style={styles.greyOverlay}>
-            <View style={styles.headerContainer}>
+            <View style={styles.characterContainer}>
                 <Image
                     style={styles.logoContainer}
                     source={require('../assets/Logo.png')}
@@ -69,22 +74,38 @@ export default function Character({
                 <TouchableOpacity
                     style={styles.backButtonContainer}
                     activeOpacity={0.2}
-                    onPress={() => setShouldShowSettings(false)}
+                    onPress={() => {}}
                 />
                 <Text style={styles.titleTxt}>Choose Your Character!</Text>
+                <View style={styles.characterContainer1}>
+                    <TouchableHighlight
+                        onPress={() => {
+                            chooseMale();
+                        }}
+                    >
+                        <Image
+                            style={styles.character1}
+                            source={require('../assets/boy.png')}
+                        ></Image>
+                    </TouchableHighlight>
+                </View>
+                <View style={styles.characterContainer2}>
+                    <TouchableHighlight
+                        onPress={() => {
+                            chooseFemale();
+                        }}
+                    >
+                        <Image
+                            style={styles.character2}
+                            source={require('../assets/girl.png')}
+                        />
+                    </TouchableHighlight>
+                </View>
             </View>
-            <View style={styles.headerContainer}>
-                <TouchableHighlight onPress={setCharacter(1)}>
-                    <Image source={require('../assets/boy.png')}></Image>
-                </TouchableHighlight>
 
-                <TouchableHighlight onPress={setCharacter(2)}>
-                    <Image source={require('../assets/girl.png')} />
-                </TouchableHighlight>
-            </View>
             <TouchableOpacity
                 onPress={() => {
-                    setChooseCharacter(false);
+                    console.log('Yay');
                 }}
                 style={styles.signOutContainer}
             >
@@ -254,5 +275,37 @@ const styles = StyleSheet.create({
     map: {
         width: '100%',
         height: '100%',
+    },
+    character1: {
+        objectFit: 'contain',
+        width: '100%',
+        height: '100%',
+    },
+    character2: {
+        width: '100%',
+        height: '100%',
+        objectFit: 'contain',
+    },
+    characterContainer: {
+        position: 'absolute',
+        top: 0,
+        width: '100%',
+        height: 250,
+        backgroundColor: '#ffc700',
+        textAlign: 'center',
+    },
+    characterContainer1: {
+        position: 'absolute',
+        top: 300,
+        left: 200,
+        width: '50%',
+        height: 300,
+    },
+    characterContainer2: {
+        position: 'absolute',
+        top: 300,
+        right: 200,
+        width: '50%',
+        height: 300,
     },
 });
