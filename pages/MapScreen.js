@@ -32,6 +32,7 @@ export default function MapScreen({ route, navigation }) {
     const [userInfo, setUserInfo] = useState({});
     const [icons, setIcons] = useState([]);
     const [ran, setRan] = useState(false);
+    const [monstersOfUser, setMonstersOfUser] = useState([])
 
     const [token, setToken] = useState('');
     const [currLocation, setCurrLocation] = useState({
@@ -54,10 +55,14 @@ export default function MapScreen({ route, navigation }) {
         //can now user userInfo.monsters for the users current monsters
 
         for (let x = 0; x < monsters.length; x++) {
+            let includes = userInfo.monsters.includes(monsters[x].id);
+            if(includes && !monstersOfUser.includes(monsters[x])){
+                setMonstersOfUser(monstersOfUser => [...monstersOfUser,monsters[x]]);
+            }
             locations.push({
                 key: monsters[x].id,
                 pos: monsters[x].pos,
-                pinColor: userInfo.monsters.includes(monsters[x].id)
+                pinColor: includes
                     ? /*green*/ '#00FF00'
                     : /*red*/ 'FF0000',
             });
@@ -125,7 +130,7 @@ export default function MapScreen({ route, navigation }) {
 
     useEffect(() => {
         getUserInfo();
-    }, []);
+    }, [token]);
 
     useEffect(() => {
         if (userInfo.monsters != null && userInfo.monsters.length !== 0) {
@@ -206,7 +211,7 @@ export default function MapScreen({ route, navigation }) {
             {shouldShowInventory ? (
                 <Inventory
                     setShouldShowInventory={setShouldShowInventory}
-                   // monsterInfo = {userInfo.monsters}
+                    monsterInfo = {monstersOfUser}
                 />
             ) : null}
             {shouldShowSettings ? (

@@ -136,9 +136,10 @@ export default function LoginPage({ navigation }) {
         })
             .then((response) => response.text())
             .then((res) => {
-                // console.log(res);
+                console.log(res);
                 try {
                     json = JSON.parse(res);
+                    console.log(json.error)
                     if (json.error == 'N/A') {
                         console.log('Register success');
                         var emailJson = {
