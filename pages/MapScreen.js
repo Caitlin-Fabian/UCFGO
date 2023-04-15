@@ -13,21 +13,26 @@ import ActionButton from 'react-native-action-button';
 import MapView, { Marker } from 'react-native-maps';
 import * as Location from 'expo-location';
 import { mapStyle } from '../styles/mapStyle';
-
+import monsters from '../components/monsters';
 import Profile from '../components/ProfileModal';
+import MonsterAt from '../components/MonsterAtModal'
 import Inventory from '../components/InventoryModal';
 import Settings from '../components/SettingsModal';
+
 
 export default function MapScreen({ route, navigation }) {
     const { userID, Name, Score } = route.params;
     var storage = require('../tokenStorage.js');
 
+
     //console.log(userID);
+
 
     const [shouldShowButtons, setShouldShowButtons] = useState(false);
     const [shouldShowProfile, setShouldShowProfile] = useState(false);
     const [shouldShowInventory, setShouldShowInventory] = useState(false);
     const [shouldShowSettings, setShouldShowSettings] = useState(false);
+    const [shouldShowMonster, setShouldShowMonster] = useState(false);
     const [shouldBack, setShouldBack] = useState(false);
     const [currLocation, setCurrLocation] = useState({coords: {latitude: 28.60160681694149, longitude: -81.20044675481425}});
     const [currUser, setCurrUser] = useState(userID);
@@ -57,6 +62,11 @@ export default function MapScreen({ route, navigation }) {
     }
     const [message, setMessage] = useState('');
     const [userInfo, setUserInfo] = useState({});
+    const [icons, setIcons] = useState([]);
+    const [ran, setRan] = useState(false);
+    const [monstersOfUser, setMonstersOfUser] = useState([])
+    const [viewedMonster, setViewedMonster] = useState(null)
+    const [isInRange, setIsInRange] = useState(null)
 
     const [token, setToken] = useState('');
 
@@ -68,6 +78,30 @@ export default function MapScreen({ route, navigation }) {
         if (distance <= 0.0008) return true;
         else return false;
     }
+
+    //creates the icons of the monster locations
+    const createIcons = async () => {
+        let locations = [];
+        //await getUserInfo();
+        //can now user userInfo.monsters for the users current monsters
+
+        for (let x = 0; x < monsters.length; x++) {
+            let includes = userInfo.monsters.includes(monsters[x].id);
+            if(includes && !monstersOfUser.includes(monsters[x])){
+                setMonstersOfUser(monstersOfUser => [...monstersOfUser,monsters[x]]);
+            }
+            locations.push({
+                key: monsters[x].id,
+                pos: monsters[x].pos,
+                pinColor: includes
+                    ? /*green*/ '#00FF00'
+                    : /*red*/ 'FF0000',
+                picture: monsters[x].picture,
+                title: monsters[x].title
+            });
+        }
+        setIcons(locations);
+    };
 
     // user to retrieve user info
     // In: UserID, jwtToken
@@ -121,11 +155,23 @@ export default function MapScreen({ route, navigation }) {
             }
 
             let location = await Location.getCurrentPositionAsync({});
-            setCurrLocation(location);
+            await new Promise((resolve) => setTimeout(resolve, 500)).then(() =>{
+                setCurrLocation(location)
+                console.log("location ping");
+            });
         })();
+    }, [currLocation]);
+
+    useEffect(() => {
         getUserInfo();
       }, [currLocation, token]);
 
+
+    useEffect(() => {
+        if (userInfo.monsters != null && userInfo.monsters.length !== 0) {
+            createIcons();
+        }
+    }, [userInfo.monsters]);
 
     return (
         <View style={styles.container}>
@@ -142,53 +188,54 @@ export default function MapScreen({ route, navigation }) {
                 followsUserLocation={true}
                 customMapStyle={mapStyle}
             >
-                <Marker
-                    coordinate={{
-                        latitude: currLocation.coords.latitude,
-                        longitude: currLocation.coords.longitude,
-                    }}
-                    onPress={(e) =>
-                        canInteract(e.nativeEvent.coordinate)
-                            ? console.log('close enough')
-                            : console.log('not close enough')
-                    }
-                />
-                <Marker
-                    coordinate={{
-                        latitude: 28.60160681694149,
-                        longitude: -81.20044675481425,
-                    }}
-                    onPress={(e) =>
-                        canInteract(e.nativeEvent.coordinate)
-                            ? console.log('close enough')
-                            : console.log('not close enough')
-                    }
-                />
+                {icons.map((marker) => (
+                    <Marker
+                        coordinate={{
+                            latitude: marker.pos.lat,
+                            longitude: marker.pos.lng,
+                        }}
+                        pinColor={marker.pinColor}
+                        key={marker.key}
+                        onPress={(e) => {
+                            canInteract(e.nativeEvent.coordinate)
+                                ? setIsInRange(true)
+                                : setIsInRange(false)
+                            
+                            setViewedMonster(marker);
+                            setShouldShowMonster(true);
+                        }
+                        }
+                    />
+                ))}
             </MapView>
             <Image
                 style={styles.logoContainer}
                 source={require('../assets/Logo.png')}
             />
-            <ActionButton autoInactive="true">
+            <ActionButton autoInactive={true}>
                 <ActionButton.Item
-                        onPress={() => {
-                            setShouldShowProfile(!shouldShowProfile);
-                            setShouldShowButtons(!shouldShowButtons);
-                        }}>
-                     <Text style={styles.opTxt}>profile</Text>
+                    onPress={() => {
+                        setShouldShowProfile(!shouldShowProfile);
+                        setShouldShowButtons(!shouldShowButtons);
+                    }}
+                >
+                    <Text style={styles.opTxt}>profile</Text>
                 </ActionButton.Item>
                 <ActionButton.Item
-                        onPress={() => {
-                            setShouldShowInventory(!shouldShowInventory);
-                            setShouldShowButtons(!shouldShowButtons);
-                        }}>
-                     <Text style={styles.opTxt}>inventory</Text>
+                    onPress={() => {
+                        setShouldShowInventory(!shouldShowInventory);
+                        setShouldShowButtons(!shouldShowButtons);
+                    }}
+                >
+                    <Text style={styles.opTxt}>inventory</Text>
                 </ActionButton.Item>
                 <ActionButton.Item
-                        onPress={() => {
-                            setShouldShowSettings(!shouldShowSettings);
-                            setShouldShowButtons(!shouldShowButtons);
-                        }}>
+
+                    onPress={() => {
+                        setShouldShowSettings(!shouldShowSettings);
+                        setShouldShowButtons(!shouldShowButtons);
+                    }}
+                >
                     <Text style={styles.opTxt}>settings</Text>
                 </ActionButton.Item>
             </ActionButton>
@@ -199,13 +246,25 @@ export default function MapScreen({ route, navigation }) {
                     userInfo={userInfo}
                 />
             ) : null}
+            {shouldShowMonster ? (
+                <MonsterAt
+                    setShouldShowMonster = {setShouldShowMonster}
+                    viewedMonster = {viewedMonster}
+                    isInRange = {isInRange}
+                    userID = {userID}
+                />
+            ) : null}
             {shouldShowInventory ? (
-                <Inventory setShouldShowInventory={setShouldShowInventory} />
+                <Inventory
+                    setShouldShowInventory={setShouldShowInventory}
+                    monsterInfo = {monstersOfUser}
+                />
             ) : null}
             {shouldShowSettings ? (
                 <Settings
                     setShouldShowSettings={setShouldShowSettings}
                     navigation={navigation}
+                    userInfo={userInfo}
                 />
             ) : null}
             <StatusBar style="auto" />
@@ -297,7 +356,7 @@ const styles = StyleSheet.create({
         fontSize: 40,
     },
     opTxt: {
-        color:"#FFFFFF",
+        color: '#FFFFFF',
         alignSelf: 'center',
         fontWeight: 'bold',
         fontSize: 12,

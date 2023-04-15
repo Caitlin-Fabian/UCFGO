@@ -9,21 +9,44 @@ import {
     Button,
     TouchableOpacity,
 } from 'react-native';
-import monsters from "./monsters";
 import ActionButton from 'react-native-action-button';
 import MapView, { Marker } from 'react-native-maps';
 import * as Location from 'expo-location';
 import { mapStyle } from '../styles/mapStyle';
-import monsterView from './monsterView';
+import monsters from './monsters';
 
-export default function Inventory({setShouldShowInventory,monsterInfo}) {
-    console.log(monsterInfo);
-    const [currMonster, setCurrMonster] = useState({});
-    const [monsterDescription, setMonsterDescription] = useState(false);
+export default function MonsterAt({setShouldShowMonster,viewedMonster, isInRange, userID}) {
 
-    const enterNewView = (monster) => {
-        setCurrMonster(monster);
-        setMonsterDescription(true);
+
+    const [isMonsterInInv, setIsMonsterInInv] = useState(viewedMonster.pinColor=== '#00FF00'/*green*/ ? true: false);
+    const [userGotMonster, setUserGotMonster] = useState(false);
+
+    const onPressGiveMonster = async() => {
+        console.log("gimme that monster");
+        await fetch('https://ucf-go.herokuapp.com/api/giveMonster', {
+        method: 'POST',
+        headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            userId: userID,
+            monsterId: viewedMonster.key,
+            monsterScore: 5, 
+        })
+        }).then((response) => response.json()).then((json) => {
+            if(json.error == 'N/A'){
+               //is working right and they have the monster
+               viewedMonster.pinColor = "#00FF00" //new color the marker becuase the person has found that monster
+               setIsMonsterInInv(true);
+               setUserGotMonster(true);
+            }
+            else{
+                console.log(json.error);
+            }
+        }).catch((error) => {
+            console.error(error);
+        });
     }
 
     return (
@@ -36,59 +59,30 @@ export default function Inventory({setShouldShowInventory,monsterInfo}) {
                 <TouchableOpacity
                     style={styles.backButtonContainer}
                     activeOpacity={0.2}
-                    onPress={() => setShouldShowInventory(false)}
+                    onPress={() => setShouldShowMonster(false)}
                 >
                     <Image
                         style={styles.backButton}
                         source={require('../assets/BackButton.png')}
                     />
                 </TouchableOpacity>
-                <Text style={styles.titleTxt}>INVENTORY</Text>
-            </View>
-            <View style={styles.monsterCardsContainer}>
-                {monsterInfo.map((monster) => (
-                    <>
-                        <TouchableOpacity
-                            style={styles.monsterCard}
-                            onPress={() => enterNewView(monster)}
-                        >
-                            <Image style={styles.monster} source={monster.picture}/>
-                        </TouchableOpacity>
-                    </>))
-
-                }
-
-            </View>
-            {monsterDescription && (<>
-                <View style={styles.headerContainer}>
-                <Image
-                    style={styles.logoContainer}
-                    source={require('../assets/Logo.png')}
-                />
-                <TouchableOpacity
-                    style={styles.backButtonContainer}
-                    activeOpacity={0.2}
-                    onPress={() => setMonsterDescription(false)}
-                >
-                    <Image
-                        style={styles.backButton}
-                        source={require('../assets/BackButton.png')}
-                    />
-                </TouchableOpacity>
-                <Text style={styles.titleTxt} >{currMonster.title}</Text>
-            </View>
-            <View >
+                <Text style={styles.titleTxt}>{isMonsterInInv ? viewedMonster.title : "???"}</Text>
                 <ImageBackground
-                        imageStyle={{ borderRadius: 25 }}
-                        style={styles.mainMonsterStyle}
-                        source={require('../assets/pokemon-background.jpg')}
-                    >
-                <Image style={styles.mainMonster} source={currMonster.picture}></Image>
+                    imageStyle={{ borderRadius: 25 }}
+                    style={styles.profilePicContainer}
+                    source={require('../assets/pokemon-background.jpg')}
+                >
+                        <Image
+                            style={[styles.profilePicImage, !isMonsterInInv && styles.silhouette]}
+                            source={viewedMonster.picture}
+                        ></Image>
                 </ImageBackground>
-            
-                <Text style={styles.descriptionText}>{currMonster.description}</Text>
-          
-            </View></>)}
+                {!isMonsterInInv && isInRange && (
+                    <TouchableOpacity style = {styles.getButtonContainer} onPress={onPressGiveMonster}>
+                         <Text style={styles.getMonsterTxt}>Get This Monster</Text>
+                    </TouchableOpacity>
+                )}
+            </View>
         </View>
     );
 }
@@ -100,20 +94,8 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
     },
-    // descriptionBackground: {
-    //     backgroundColor:"#ffffff",
-    //     top:'-35%',
-    //     height:'12%',
-    //     padding: 10
-    // },
-    descriptionText: {
-        padding:10,
-        backgroundColor:"#ffffff",
-        position: 'absolute',
-        top: '40%',
-        alignSelf: 'center',
-        fontWeight: 'bold',
-        fontSize: 20,
+    silhouette: {
+        tintColor:"#008fff"
     },
     logoContainer: {
         position: 'absolute',
@@ -138,23 +120,6 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
     },
-    mainMonsterStyle: {
-        backgroundColor: '#ffffff',
-        top:'-26%',
-        height: '80%',
-        width: '100%',
-        borderRadius:25
-        
-    },
-    mainMonster: {
-        top:0,
-        height: "80%",
-        justifyContent: 'center',
-        alignSelf: 'center',
-        objectFit: 'contain', // Change the scale value as needed
-        borderRadius:25
-    },
-
     inventoryButton: {
         height: 90,
         width: 90,
@@ -208,50 +173,59 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         fontSize: 40,
     },
+    getMonsterTxt: {
+        alignSelf: 'center',
+        fontWeight: 'bold',
+        fontSize: 40,
+    },
     profilePicContainer: {
         position: 'absolute',
-        top: 220,
+        top: 200,
         alignSelf: 'center',
+        //alignItems: 'center',
         backgroundColor: '#fff',
+        justifyContent: 'center',
         borderRadius: 25,
-        height: 250,
-        width: 250,
+        resizeMode: 'cover',
+        height: '150%',
+        width: '100%',
+    },
+    profilePicImage: {
+        objectFit: 'contain',
+        top: 50,
+        width: 400,
+        height: 400,
+
     },
     profileInfoContainter: {
         position: 'absolute',
         top: 500,
         alignSelf: 'center',
+        justifyContent: 'center',
+        alignItems: 'center',
         backgroundColor: '#fff',
         borderRadius: 25,
+        resizeMode: 'cover',
         height: 300,
         width: 350,
     },
+    profileInfoText: { marginTop: 10, fontWeight: 'bold', fontSize: 20 },
     monsterCardsContainer: {
-        top:220,
-        display: 'flex',
+        position: 'absolute',
+        top: 220,
+        alignSelf: 'center',
+        height: 570,
+        width: '100%',
+        alignItems: 'flex-start',
         flexDirection: 'row',
-        flexWrap: 'wrap', // Wrap cards to the next row when there isn't enough room
-        justifyContent: 'flex-start', // Align card
-      },
-      monsterCard: {
+        justifyContent: 'space-around',
+    },
+    monsterCard: {
         backgroundColor: '#fff',
-        padding: 20,
-        justifyContent: 'center',
-        alignItems: 'center',
         borderRadius: 10,
-        height: 121,
-        width: 121,
-        margin: 5,
-      },
-      monster: {
-        backgroundColor: '#fff',
-        height: 115,
-        width: 115,
-        justifyContent: 'center',
-        alignItems: 'center',
-        // /transform: [{ scale: 0.9 }],
-        objectFit: 'contain', // Change the scale value as needed
-      },
+        height: 100,
+        width: 100,
+    },
     changePasswordContainer: {
         position: 'absolute',
         bottom: 30,
@@ -273,6 +247,14 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         justifyContent: 'center',
         alignItems: 'center',
+    },
+    getButtonContainer: {
+        top: '350%',
+        height:'50%',
+        borderRadius: 10,
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: '#ffffff',
     },
     map: {
         width: '100%',
