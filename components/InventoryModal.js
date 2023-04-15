@@ -1,6 +1,6 @@
 import { StatusBar } from 'expo-status-bar';
 import React, { useEffect, useState } from 'react';
-import { LogBox } from 'react-native';
+import { ImageBackground, LogBox } from 'react-native';
 import {
     StyleSheet,
     Text,
@@ -16,11 +16,16 @@ import * as Location from 'expo-location';
 import { mapStyle } from '../styles/mapStyle';
 import monsterView from './monsterView';
 
-export default function Inventory({ setShouldShowInventory, monsterInfo }) {
+export default function Inventory({setShouldShowInventory,monsterInfo}) {
+    console.log(monsterInfo);
+    const [currMonster, setCurrMonster] = useState({});
+    const [monsterDescription, setMonsterDescription] = useState(false);
 
+    const enterNewView = (monster) => {
+        setCurrMonster(monster);
+        setMonsterDescription(true);
+    }
 
-
-    console.log('hello');
     return (
         <View style={styles.greyOverlay}>
             <View style={styles.headerContainer}>
@@ -43,17 +48,47 @@ export default function Inventory({ setShouldShowInventory, monsterInfo }) {
             <View style={styles.monsterCardsContainer}>
                 {monsterInfo.map((monster) => (
                     <>
-                        <ActionButton
+                        <TouchableOpacity
                             style={styles.monsterCard}
-                            onPress={() => monsterView(monster)}
+                            onPress={() => enterNewView(monster)}
                         >
-                            <Image source={monster.picture}/>
-                        </ActionButton>
+                            <Image style={styles.monster} source={monster.picture}/>
+                        </TouchableOpacity>
                     </>))
 
                 }
 
             </View>
+            {monsterDescription && (<>
+                <View style={styles.headerContainer}>
+                <Image
+                    style={styles.logoContainer}
+                    source={require('../assets/Logo.png')}
+                />
+                <TouchableOpacity
+                    style={styles.backButtonContainer}
+                    activeOpacity={0.2}
+                    onPress={() => setMonsterDescription(false)}
+                >
+                    <Image
+                        style={styles.backButton}
+                        source={require('../assets/BackButton.png')}
+                    />
+                </TouchableOpacity>
+                <Text style={styles.titleTxt} >{currMonster.title}</Text>
+            </View>
+            <View >
+                <ImageBackground
+                        imageStyle={{ borderRadius: 25 }}
+                        style={styles.mainMonsterStyle}
+                        source={require('../assets/pokemon-background.jpg')}
+                    >
+                <Image style={styles.mainMonster} source={currMonster.picture}></Image>
+                </ImageBackground>
+            <ImageBackground style={styles.descriptionBackground}>
+                <Text style={styles.descriptionText}>{currMonster.description}</Text>
+            </ImageBackground>
+            </View></>)}
         </View>
     );
 }
@@ -64,6 +99,20 @@ const styles = StyleSheet.create({
         backgroundColor: '#bebebe',
         alignItems: 'center',
         justifyContent: 'center',
+    },
+    descriptionBackground: {
+        backgroundColor:"#ffffff",
+        top:'-22%',
+        height:'12%',
+    },
+    descriptionText: {
+        padding:10,
+        backgroundColor:"#ffffff",
+        position: 'absolute',
+        top: '-15%',
+        alignSelf: 'center',
+        fontWeight: 'bold',
+        fontSize: 20,
     },
     logoContainer: {
         position: 'absolute',
@@ -88,6 +137,23 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
     },
+    mainMonsterStyle: {
+        backgroundColor: '#ffffff',
+        top:'-8%',
+        height: '80%',
+        width: '100%',
+        borderRadius:25
+        
+    },
+    mainMonster: {
+        top:0,
+        height: "80%",
+        justifyContent: 'center',
+        alignSelf: 'center',
+        objectFit: 'contain', // Change the scale value as needed
+        borderRadius:25
+    },
+
     inventoryButton: {
         height: 90,
         width: 90,
@@ -160,21 +226,31 @@ const styles = StyleSheet.create({
         width: 350,
     },
     monsterCardsContainer: {
-        position: 'absolute',
-        top: 220,
-        alignSelf: 'center',
-        height: 570,
-        width: '100%',
-        alignItems: 'flex-start',
+        top:220,
+        display: 'flex',
         flexDirection: 'row',
-        justifyContent: 'space-around',
-    },
-    monsterCard: {
+        flexWrap: 'wrap', // Wrap cards to the next row when there isn't enough room
+        justifyContent: 'flex-start', // Align card
+      },
+      monsterCard: {
         backgroundColor: '#fff',
+        padding: 20,
+        justifyContent: 'center',
+        alignItems: 'center',
         borderRadius: 10,
-        height: 100,
-        width: 100,
-    },
+        height: 121,
+        width: 121,
+        margin: 5,
+      },
+      monster: {
+        backgroundColor: '#fff',
+        height: 115,
+        width: 115,
+        justifyContent: 'center',
+        alignItems: 'center',
+        // /transform: [{ scale: 0.9 }],
+        objectFit: 'contain', // Change the scale value as needed
+      },
     changePasswordContainer: {
         position: 'absolute',
         bottom: 30,
