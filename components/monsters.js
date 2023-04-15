@@ -58,7 +58,7 @@ export const monsters = [
         id: 9,
         title: 'Squeaky',
         picture: squeaky,
-        description: "Meet Squeaky, the quackiest resident of the Reflection Pond! This rubber duck loves to float on its back and soak up the sun, and it's always up for some fun and playful splashing with any passersby who want to join in on the fun.",
+        description: "This rubber duck loves to float on its back and soak up the sun, and it's always up for some fun and playful splashing with any passersby who want to join in on the fun.",
         pos: { lat: 28.59966114045313, lng: -81.20186750937363}//Reflection Pond
     },
     {

@@ -15,6 +15,7 @@ import * as Location from 'expo-location';
 import { mapStyle } from '../styles/mapStyle';
 import monsters from '../components/monsters';
 import Profile from '../components/ProfileModal';
+import MonsterAt from '../components/MonsterAtModal'
 import Inventory from '../components/InventoryModal';
 import Settings from '../components/SettingsModal';
 
@@ -27,12 +28,15 @@ export default function MapScreen({ route, navigation }) {
     const [shouldShowProfile, setShouldShowProfile] = useState(false);
     const [shouldShowInventory, setShouldShowInventory] = useState(false);
     const [shouldShowSettings, setShouldShowSettings] = useState(false);
+    const [shouldShowMonster, setShouldShowMonster] = useState(false);
     const [shouldBack, setShouldBack] = useState(false);
     const [message, setMessage] = useState('');
     const [userInfo, setUserInfo] = useState({});
     const [icons, setIcons] = useState([]);
     const [ran, setRan] = useState(false);
     const [monstersOfUser, setMonstersOfUser] = useState([])
+    const [viewedMonster, setViewedMonster] = useState(null)
+    const [isInRange, setIsInRange] = useState(null)
 
     const [token, setToken] = useState('');
     const [currLocation, setCurrLocation] = useState({
@@ -65,6 +69,8 @@ export default function MapScreen({ route, navigation }) {
                 pinColor: includes
                     ? /*green*/ '#00FF00'
                     : /*red*/ 'FF0000',
+                picture: monsters[x].picture,
+                title: monsters[x].title
             });
         }
         setIcons(locations);
@@ -122,9 +128,10 @@ export default function MapScreen({ route, navigation }) {
             }
 
             let location = await Location.getCurrentPositionAsync({});
-            await new Promise((resolve) => setTimeout(resolve, 1000)).then(() =>
+            await new Promise((resolve) => setTimeout(resolve, 500)).then(() =>{
                 setCurrLocation(location)
-            );
+                console.log("location ping");
+            });
         })();
     }, [currLocation]);
 
@@ -134,10 +141,8 @@ export default function MapScreen({ route, navigation }) {
 
     useEffect(() => {
         if (userInfo.monsters != null && userInfo.monsters.length !== 0) {
-            console.log("markers online :sunglasses:")
             createIcons();
         }
-        console.log("went into markers use effect")
     }, [userInfo.monsters]);
 
     return (
@@ -163,10 +168,14 @@ export default function MapScreen({ route, navigation }) {
                         }}
                         pinColor={marker.pinColor}
                         key={marker.key}
-                        onPress={(e) =>
+                        onPress={(e) => {
                             canInteract(e.nativeEvent.coordinate)
-                                ? console.log('close enough')
-                                : console.log('not close enough')
+                                ? setIsInRange(true)
+                                : setIsInRange(false)
+                            
+                            setViewedMonster(marker);
+                            setShouldShowMonster(true);
+                        }
                         }
                     />
                 ))}
@@ -206,6 +215,14 @@ export default function MapScreen({ route, navigation }) {
                     setShouldShowProfile={setShouldShowProfile}
                     userID={userID}
                     userInfo={userInfo}
+                />
+            ) : null}
+            {shouldShowMonster ? (
+                <MonsterAt
+                    setShouldShowMonster = {setShouldShowMonster}
+                    viewedMonster = {viewedMonster}
+                    isInRange = {isInRange}
+                    userID = {userID}
                 />
             ) : null}
             {shouldShowInventory ? (
