@@ -164,7 +164,7 @@ export default function MapScreen({ route, navigation }) {
 
     useEffect(() => {
         getUserInfo();
-      }, [currLocation, token]);
+      }, [token]);
 
 
     useEffect(() => {
