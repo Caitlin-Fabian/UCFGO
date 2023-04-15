@@ -157,7 +157,7 @@ export default function MapScreen({ route, navigation }) {
             let location = await Location.getCurrentPositionAsync({});
             await new Promise((resolve) => setTimeout(resolve, 500)).then(() =>{
                 setCurrLocation(location)
-                console.log("location ping");
+                //console.log("location ping");
             });
         })();
     }, [currLocation]);
