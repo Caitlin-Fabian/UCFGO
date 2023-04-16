@@ -53,8 +53,8 @@ export default function LoginPage({ navigation }) {
     // AsyncStorage Name, Score, ID
     const onPressLogIn = async () => {
         let js = JSON.stringify({
-            username: loginUsername,
-            password: loginPassword,
+            username: loginUsername.trim(),
+            password: loginPassword.trim(),
         });
         await fetch('https://ucf-go.herokuapp.com/api/login', {
             method: 'POST',
@@ -119,10 +119,10 @@ export default function LoginPage({ navigation }) {
     // Register Function
     const onPressRegister = async () => {
         let js =  JSON.stringify({
-            username: registerUsername,
-            password: registerPassword,
-            name: registerName,
-            email:registerEmail
+            username: registerUsername.trim(),
+            password: registerPassword.trim(),
+            name: registerName.trim(),
+            email:registerEmail.trim()
         });
 
         console.log("js sent"+js);

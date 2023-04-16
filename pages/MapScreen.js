@@ -13,13 +13,26 @@ import ActionButton from 'react-native-action-button';
 import MapView, { Marker } from 'react-native-maps';
 import * as Location from 'expo-location';
 import { mapStyle } from '../styles/mapStyle';
-import monsters from '../components/monsters';
 import Profile from '../components/ProfileModal';
+import MonsterAt from '../components/MonsterAtModal';
 import Inventory from '../components/InventoryModal';
 import Settings from '../components/SettingsModal';
 import Character from '../components/Character';
 
 export default function MapScreen({ route, navigation }) {
+    const imagePath = {
+        1: require('../assets/1.png'),
+        2: require('../assets/2.png'),
+        3: require('../assets/3.png'),
+        4: require('../assets/4.png'),
+        5: require('../assets/5.png'),
+        6: require('../assets/6.png'),
+        7: null, //require('../assets/7.png'),
+        8: null, //require('../assets/8.png'),
+        9: require('../assets/9.png'),
+        10: require('../assets/10.png'),
+        11: null, //require('../assets/11.png'),
+    };
     const { userID, Name, Score } = route.params;
     var storage = require('../tokenStorage.js');
 
@@ -32,6 +45,12 @@ export default function MapScreen({ route, navigation }) {
     const [icons, setIcons] = useState([]);
     const [character, setCharacter] = useState(false);
     const [monstersOfUser, setMonstersOfUser] = useState([]);
+    const [shouldShowMonster, setShouldShowMonster] = useState(false);
+    const [shouldBack, setShouldBack] = useState(false);
+    const [ran, setRan] = useState(false);
+    const [monsters, setMonsters] = useState([]);
+    const [viewedMonster, setViewedMonster] = useState(null);
+    const [isInRange, setIsInRange] = useState(null);
 
     const [token, setToken] = useState('');
     const [currLocation, setCurrLocation] = useState({
@@ -52,7 +71,6 @@ export default function MapScreen({ route, navigation }) {
         let locations = [];
         //await getUserInfo();
         //can now user userInfo.monsters for the users current monsters
-
         for (let x = 0; x < monsters.length; x++) {
             let includes = userInfo.monsters.includes(monsters[x].id);
             if (includes && !monstersOfUser.includes(monsters[x])) {
@@ -61,11 +79,18 @@ export default function MapScreen({ route, navigation }) {
                     monsters[x],
                 ]);
             }
+            //monsters[x].push({picture: imagePath[monsters[x]._id],})
             locations.push({
-                key: monsters[x].id,
-                pos: monsters[x].pos,
+                key: monsters[x]._id,
+                pos: {
+                    latitude: parseFloat(monsters[x].lat),
+                    longitude: parseFloat(monsters[x].lng),
+                },
                 pinColor: includes ? /*green*/ '#00FF00' : /*red*/ 'FF0000',
+                picture: imagePath[monsters[x]._id],
+                title: monsters[x].Name,
             });
+            console.log('pos' + locations[x].picture);
         }
         setIcons(locations);
     };
@@ -108,6 +133,26 @@ export default function MapScreen({ route, navigation }) {
             setCharacter(true);
         }
     };
+    const getMonsters = async () => {
+        console.log('Token: ' + token);
+
+        await fetch('https://ucf-go.herokuapp.com/api/getMonsterList', {
+            method: 'POST',
+            headers: {
+                Accept: 'application/json',
+                'Content-Type': 'application/json',
+            },
+        })
+            .then((response) => response.json())
+            .then((json) => {
+                console.log(json.monsterList);
+                setMonsters(json.monsterList);
+            })
+            .catch((error) => {
+                console.error(error);
+            });
+    };
+
     useEffect(() => {
         LogBox.ignoreLogs(['Animated: `useNativeDriver`']);
         storage
@@ -128,13 +173,17 @@ export default function MapScreen({ route, navigation }) {
             }
 
             let location = await Location.getCurrentPositionAsync({});
-            await new Promise((resolve) => setTimeout(resolve, 1000)).then(() =>
-                setCurrLocation(location)
+            await new Promise((resolve) => setTimeout(resolve, 500)).then(
+                () => {
+                    setCurrLocation(location);
+                    console.log('location ping');
+                }
             );
         })();
     }, [currLocation]);
 
     useEffect(() => {
+        getMonsters();
         getUserInfo();
     }, [token]);
 
@@ -163,17 +212,17 @@ export default function MapScreen({ route, navigation }) {
             >
                 {icons.map((marker) => (
                     <Marker
-                        coordinate={{
-                            latitude: marker.pos.lat,
-                            longitude: marker.pos.lng,
-                        }}
+                        coordinate={marker.pos}
                         pinColor={marker.pinColor}
                         key={marker.key}
-                        onPress={(e) =>
+                        onPress={(e) => {
                             canInteract(e.nativeEvent.coordinate)
-                                ? console.log('close enough')
-                                : console.log('not close enough')
-                        }
+                                ? setIsInRange(true)
+                                : setIsInRange(false);
+
+                            setViewedMonster(marker);
+                            setShouldShowMonster(true);
+                        }}
                     />
                 ))}
             </MapView>
@@ -218,6 +267,14 @@ export default function MapScreen({ route, navigation }) {
                     setShouldShowProfile={setShouldShowProfile}
                     userID={userID}
                     userInfo={userInfo}
+                />
+            ) : null}
+            {shouldShowMonster ? (
+                <MonsterAt
+                    setShouldShowMonster={setShouldShowMonster}
+                    viewedMonster={viewedMonster}
+                    isInRange={isInRange}
+                    userID={userID}
                 />
             ) : null}
             {shouldShowInventory ? (
