@@ -238,7 +238,7 @@ export default function MapScreen({ route, navigation }) {
                     }}
                 >
 
-                <Image source={require("../assets/profile.png")}></Image> 
+                {/* <Image source={require("../assets/profile.png")}></Image>  */}
                 {/* <Text style={styles.opTxt}>profile</Text> */}
                 </ActionButton.Item>
                 <ActionButton.Item
@@ -247,7 +247,7 @@ export default function MapScreen({ route, navigation }) {
                         setShouldShowButtons(!shouldShowButtons);
                     }}
                 >
-                <Image source={require("../assets/profile.png")}></Image> 
+                {/* <Image source={require("../assets/profile.png")}></Image>  */}
                 </ActionButton.Item>
                 <ActionButton.Item
                     onPress={() => {
@@ -255,7 +255,7 @@ export default function MapScreen({ route, navigation }) {
                         setShouldShowButtons(!shouldShowButtons);
                     }}
                 >
-                <Image source={require("../assets/settings.png")}></Image> 
+                {/* <Image source={require("../assets/settings.png")}></Image>  */}
                 </ActionButton.Item>
             </ActionButton>
             {character ? (
