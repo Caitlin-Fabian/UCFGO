@@ -237,7 +237,9 @@ export default function MapScreen({ route, navigation }) {
                         setShouldShowButtons(!shouldShowButtons);
                     }}
                 >
-                    <Text style={styles.opTxt}>profile</Text>
+
+                <Image source={require("../assets/profile.png")}></Image> 
+                {/* <Text style={styles.opTxt}>profile</Text> */}
                 </ActionButton.Item>
                 <ActionButton.Item
                     onPress={() => {
@@ -245,15 +247,15 @@ export default function MapScreen({ route, navigation }) {
                         setShouldShowButtons(!shouldShowButtons);
                     }}
                 >
-                    <Text style={styles.opTxt}>inventory</Text>
+                <Image source={require("../assets/profile.png")}></Image> 
                 </ActionButton.Item>
                 <ActionButton.Item
                     onPress={() => {
-                        setShouldShowSettings(!shouldShowProfile);
+                        setShouldShowSettings(!shouldShowSettings);
                         setShouldShowButtons(!shouldShowButtons);
                     }}
                 >
-                    <Text style={styles.opTxt}>settings</Text>
+                <Image source={require("../assets/settings.png")}></Image> 
                 </ActionButton.Item>
             </ActionButton>
             {character ? (
