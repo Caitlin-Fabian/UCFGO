@@ -80,7 +80,7 @@ export default function LoginPage({ navigation }) {
                         .retrieveToken()
                         .then((data) => data)
                         .then((value) => {
-                            console.log('Horrary' + value);
+                            // console.log('Horrary' + value);
                             ud = jwt_decode(value);
                             console.log(ud);
                             navigation.navigate('Map', {
@@ -118,14 +118,14 @@ export default function LoginPage({ navigation }) {
 
     // Register Function
     const onPressRegister = async () => {
-        let js =  JSON.stringify({
+        let js = JSON.stringify({
             username: registerUsername.trim(),
             password: registerPassword.trim(),
             name: registerName.trim(),
-            email:registerEmail.trim()
+            email: registerEmail.trim(),
         });
 
-        console.log("js sent"+js);
+        console.log('js sent' + js);
         await fetch('https://ucf-go.herokuapp.com/api/register', {
             method: 'POST',
             headers: {
@@ -139,12 +139,12 @@ export default function LoginPage({ navigation }) {
                 console.log(res);
                 try {
                     json = JSON.parse(res);
-                    console.log(json.error)
+                    console.log(json.error);
                     if (json.error == 'N/A') {
                         console.log('Register success');
                         var emailJson = {
-                            userEmail: registerEmail
-                        }
+                            userEmail: registerEmail,
+                        };
                         setRegisterMessage('User registered successfully');
                         setRegisterUsername('');
                         setRegisterPassword('');
@@ -220,7 +220,7 @@ export default function LoginPage({ navigation }) {
                             <Text style={styles.inputBoxText}>Username:</Text>
                             <TextInput
                                 style={styles.inputBox}
-                                value = {loginUsername}
+                                value={loginUsername}
                                 onChangeText={(newText) =>
                                     setLoginUsername(newText)
                                 }
@@ -229,7 +229,7 @@ export default function LoginPage({ navigation }) {
                             <TextInput
                                 style={styles.inputBox}
                                 secureTextEntry
-                                value = {loginPassword}
+                                value={loginPassword}
                                 onChangeText={(newText) =>
                                     setLoginPassword(newText)
                                 }
@@ -271,38 +271,42 @@ export default function LoginPage({ navigation }) {
                         {/* Register */}
                         <View style={styles.login}>
                             <ScrollView>
-                            <Text style={styles.inputBoxText}>Username:</Text>
-                            <TextInput
-                                style={styles.inputBox}
-                               // value={registerUsername}
-                                onChangeText={(newText) =>
-                                    setRegisterUsername(newText)
-                                }
-                            />
-                            <Text style={styles.inputBoxText}>Password:</Text>
-                            <TextInput
-                                style={styles.inputBox}
-                               // value={registerPassword}
-                                onChangeText={(newText) =>
-                                    setRegisterPassword(newText)
-                                }
-                            />
-                            <Text style={styles.inputBoxText}>Name:</Text>
-                            <TextInput
-                                style={styles.inputBox}
-                              //  value={registerName}
-                                onChangeText={(newText) =>
-                                    setRegisterName(newText)
-                                }
-                            />
-                            <Text style={styles.inputBoxText}>Email:</Text>
-                            <TextInput
-                                style={styles.inputBox}
-                               // value={registerEmail}
-                                onChangeText={(newText) =>
-                                    setRegisterEmail(newText)
-                                }
-                            />
+                                <Text style={styles.inputBoxText}>
+                                    Username:
+                                </Text>
+                                <TextInput
+                                    style={styles.inputBox}
+                                    // value={registerUsername}
+                                    onChangeText={(newText) =>
+                                        setRegisterUsername(newText)
+                                    }
+                                />
+                                <Text style={styles.inputBoxText}>
+                                    Password:
+                                </Text>
+                                <TextInput
+                                    style={styles.inputBox}
+                                    // value={registerPassword}
+                                    onChangeText={(newText) =>
+                                        setRegisterPassword(newText)
+                                    }
+                                />
+                                <Text style={styles.inputBoxText}>Name:</Text>
+                                <TextInput
+                                    style={styles.inputBox}
+                                    //  value={registerName}
+                                    onChangeText={(newText) =>
+                                        setRegisterName(newText)
+                                    }
+                                />
+                                <Text style={styles.inputBoxText}>Email:</Text>
+                                <TextInput
+                                    style={styles.inputBox}
+                                    // value={registerEmail}
+                                    onChangeText={(newText) =>
+                                        setRegisterEmail(newText)
+                                    }
+                                />
                             </ScrollView>
                             <Text style={styles.smallText}>
                                 Already have an account?{' '}

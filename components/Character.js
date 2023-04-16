@@ -1,6 +1,6 @@
 import { StatusBar } from 'expo-status-bar';
 import React, { useEffect, useState } from 'react';
-import { LogBox } from 'react-native';
+import { LogBox, TouchableHighlight } from 'react-native';
 import {
     StyleSheet,
     Text,
@@ -18,24 +18,55 @@ import { mapStyle } from '../styles/mapStyle';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-export default function Settings({
-    navigation,
-    setShouldShowSettings,
-    userInfo,
-}) {
+export default function Character({ navigation, setCharacter, userInfo }) {
     const [changeSettings, setChangeSettings] = useState(true);
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
+    const [characterNumber, setCharacterNumber] = useState(0);
 
-    const doLogout = () => {
-        navigation.navigate('Login');
-        AsyncStorage.removeItem('token_data');
+    console.log('HELLLLLLP ME');
+    const chooseMale = () => {
+        setCharacterNumber(1);
     };
 
-    console.log('hello');
+    const chooseFemale = () => {
+        setCharacterNumber(2);
+    };
+    const chooseCharacter = async () => {
+        console.log(characterNumber);
+        let js = JSON.stringify({
+            character: characterNumber,
+            name: null,
+            username: null,
+            userId: userInfo.id,
+            email: null,
+        });
+
+        await fetch('https://ucf-go.herokuapp.com/api/updateUser', {
+            method: 'POST',
+            headers: {
+                Accept: 'application/json',
+                'Content-Type': 'application/json',
+            },
+            body: js,
+        })
+            .then((response) => response.json())
+            .then((json) => {
+                console.log(json);
+                if (json.error) {
+                    setMessage('API IS NOT WORKING');
+                } else {
+                    setCharacter(false);
+                }
+            })
+            .catch((error) => {
+                console.error(error);
+            });
+    };
+
     return (
         <View style={styles.greyOverlay}>
-            <View style={styles.headerContainer}>
+            <View style={styles.characterContainer}>
                 <Image
                     style={styles.logoContainer}
                     source={require('../assets/Logo.png')}
@@ -43,90 +74,46 @@ export default function Settings({
                 <TouchableOpacity
                     style={styles.backButtonContainer}
                     activeOpacity={0.2}
-                    onPress={() => setShouldShowSettings(false)}
-                >
-                    <Image
-                        style={styles.backButton}
-                        source={require('../assets/BackButton.png')}
-                    />
-                </TouchableOpacity>
-                <Text style={styles.titleTxt}>SETTINGS</Text>
+                    onPress={() => {}}
+                />
+                <Text style={styles.titleTxt}>Choose Your Character!</Text>
+                <View style={styles.characterContainer1}>
+                    <TouchableHighlight
+                        onPress={() => {
+                            chooseMale();
+                        }}
+                    >
+                        <Image
+                            style={styles.character1}
+                            source={require('../assets/boy.png')}
+                        ></Image>
+                    </TouchableHighlight>
+                </View>
+                <View style={styles.characterContainer2}>
+                    <TouchableHighlight
+                        onPress={() => {
+                            chooseFemale();
+                        }}
+                    >
+                        <Image
+                            style={styles.character2}
+                            source={require('../assets/girl.png')}
+                        />
+                    </TouchableHighlight>
+                </View>
             </View>
-            {changeSettings ? (
-                <>
-                    <TouchableOpacity
-                        style={styles.changePasswordContainer}
-                        onPress={() => {
-                            setChangeSettings(false);
-                        }}
-                    >
-                        <Text style={{ fontWeight: 'bold', fontSize: 20 }}>
-                            CHANGE PROFILE SETTINGS
-                        </Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                        onPress={() => {
-                            doLogout();
-                        }}
-                        style={styles.signOutContainer}
-                    >
-                        <Text style={{ fontWeight: 'bold', fontSize: 20 }}>
-                            SIGN OUT
-                        </Text>
-                    </TouchableOpacity>
-                </>
-            ) : (
-                <>
-                    <View style={styles.editingContainer}>
-                        <Text
-                            style={{
-                                fontSize: 20,
-                                color: '#fff',
-                            }}
-                        >
-                            Name:
-                        </Text>
-                        <TextInput
-                            style={styles.changeNameInput}
-                            onChangeText={setName}
-                            value={name}
-                        />
-                        <Text
-                            style={{
-                                fontSize: 20,
-                                color: '#fff',
-                            }}
-                        >
-                            Email:
-                        </Text>
-                        <TextInput
-                            style={styles.changeNameInput}
-                            onChangeText={setName}
-                            value={name}
-                        />
-                    </View>
-                    <TouchableOpacity
-                        onPress={() => {
-                            doLogout();
-                        }}
-                        style={styles.signOutContainer}
-                    >
-                        <Text style={{ fontWeight: 'bold', fontSize: 20 }}>
-                            SAVE CHANGES
-                        </Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                        style={styles.changePasswordContainer}
-                        onPress={() => {
-                            setChangeSettings(true);
-                        }}
-                    >
-                        <Text style={{ fontWeight: 'bold', fontSize: 20 }}>
-                            CANCEL
-                        </Text>
-                    </TouchableOpacity>
-                </>
-            )}
+
+            <TouchableOpacity
+                onPress={() => {
+                    console.log('Yay');
+                    chooseCharacter();
+                }}
+                style={styles.signOutContainer}
+            >
+                <Text style={{ fontWeight: 'bold', fontSize: 20 }}>
+                    CHOOSE!
+                </Text>
+            </TouchableOpacity>
         </View>
     );
 }
@@ -289,5 +276,37 @@ const styles = StyleSheet.create({
     map: {
         width: '100%',
         height: '100%',
+    },
+    character1: {
+        objectFit: 'contain',
+        width: '100%',
+        height: '100%',
+    },
+    character2: {
+        width: '100%',
+        height: '100%',
+        objectFit: 'contain',
+    },
+    characterContainer: {
+        position: 'absolute',
+        top: 0,
+        width: '100%',
+        height: 250,
+        backgroundColor: '#ffc700',
+        textAlign: 'center',
+    },
+    characterContainer1: {
+        position: 'absolute',
+        top: 300,
+        left: 200,
+        width: '50%',
+        height: 300,
+    },
+    characterContainer2: {
+        position: 'absolute',
+        top: 300,
+        right: 200,
+        width: '50%',
+        height: 300,
     },
 });

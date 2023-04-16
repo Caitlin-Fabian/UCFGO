@@ -14,10 +14,10 @@ import MapView, { Marker } from 'react-native-maps';
 import * as Location from 'expo-location';
 import { mapStyle } from '../styles/mapStyle';
 import Profile from '../components/ProfileModal';
-import MonsterAt from '../components/MonsterAtModal'
+import MonsterAt from '../components/MonsterAtModal';
 import Inventory from '../components/InventoryModal';
 import Settings from '../components/SettingsModal';
-
+import Character from '../components/Character';
 
 export default function MapScreen({ route, navigation }) {
     const imagePath = {
@@ -27,12 +27,12 @@ export default function MapScreen({ route, navigation }) {
         4: require('../assets/4.png'),
         5: require('../assets/5.png'),
         6: require('../assets/6.png'),
-        7: null,//require('../assets/7.png'),
-        8: null,//require('../assets/8.png'),
+        7: null, //require('../assets/7.png'),
+        8: null, //require('../assets/8.png'),
         9: require('../assets/9.png'),
         10: require('../assets/10.png'),
-        11: null//require('../assets/11.png'),
-      };
+        11: null, //require('../assets/11.png'),
+    };
     const { userID, Name, Score } = route.params;
     var storage = require('../tokenStorage.js');
 
@@ -40,16 +40,17 @@ export default function MapScreen({ route, navigation }) {
     const [shouldShowProfile, setShouldShowProfile] = useState(false);
     const [shouldShowInventory, setShouldShowInventory] = useState(false);
     const [shouldShowSettings, setShouldShowSettings] = useState(false);
-    const [shouldShowMonster, setShouldShowMonster] = useState(false);
-    const [shouldBack, setShouldBack] = useState(false);
     const [message, setMessage] = useState('');
     const [userInfo, setUserInfo] = useState({});
     const [icons, setIcons] = useState([]);
+    const [character, setCharacter] = useState(false);
+    const [monstersOfUser, setMonstersOfUser] = useState([]);
+    const [shouldShowMonster, setShouldShowMonster] = useState(false);
+    const [shouldBack, setShouldBack] = useState(false);
     const [ran, setRan] = useState(false);
     const [monsters, setMonsters] = useState([]);
-    const [monstersOfUser, setMonstersOfUser] = useState([])
-    const [viewedMonster, setViewedMonster] = useState(null)
-    const [isInRange, setIsInRange] = useState(null)
+    const [viewedMonster, setViewedMonster] = useState(null);
+    const [isInRange, setIsInRange] = useState(null);
 
     const [token, setToken] = useState('');
     const [currLocation, setCurrLocation] = useState({
@@ -72,20 +73,24 @@ export default function MapScreen({ route, navigation }) {
         //can now user userInfo.monsters for the users current monsters
         for (let x = 0; x < monsters.length; x++) {
             let includes = userInfo.monsters.includes(monsters[x]._id);
-            if(includes && !monstersOfUser.includes(monsters[x])){
-                setMonstersOfUser(monstersOfUser => [...monstersOfUser,monsters[x]]);
+            if (includes && !monstersOfUser.includes(monsters[x])) {
+                setMonstersOfUser((monstersOfUser) => [
+                    ...monstersOfUser,
+                    monsters[x],
+                ]);
             }
             //monsters[x].push({picture: imagePath[monsters[x]._id],})
             locations.push({
                 key: monsters[x]._id,
-                pos: {latitude:parseFloat(monsters[x].lat), longitude:parseFloat(monsters[x].lng)},
-                pinColor: includes
-                    ? /*green*/ '#00FF00'
-                    : /*red*/ 'FF0000',
+                pos: {
+                    latitude: parseFloat(monsters[x].lat),
+                    longitude: parseFloat(monsters[x].lng),
+                },
+                pinColor: includes ? /*green*/ '#00FF00' : /*red*/ 'FF0000',
                 picture: imagePath[monsters[x]._id],
-                title: monsters[x].Name
+                title: monsters[x].Name,
             });
-            console.log("pos"+locations[x].picture);
+            console.log('pos' + locations[x].picture);
         }
         setIcons(locations);
     };
@@ -123,6 +128,11 @@ export default function MapScreen({ route, navigation }) {
             });
     };
 
+    const chooseCharacter = () => {
+        if (userInfo.character == 0) {
+            setCharacter(true);
+        }
+    };
     const getMonsters = async () => {
         console.log('Token: ' + token);
 
@@ -149,7 +159,7 @@ export default function MapScreen({ route, navigation }) {
             .retrieveToken()
             .then((data) => data)
             .then((value) => {
-                console.log('Horrary' + value);
+                // console.log('Horrary' + value);
                 setToken(value);
             });
     });
@@ -163,22 +173,26 @@ export default function MapScreen({ route, navigation }) {
             }
 
             let location = await Location.getCurrentPositionAsync({});
-            await new Promise((resolve) => setTimeout(resolve, 500)).then(() =>{
-                setCurrLocation(location)
-                console.log("location ping");
-            });
+            await new Promise((resolve) => setTimeout(resolve, 500)).then(
+                () => {
+                    setCurrLocation(location);
+                    console.log('location ping');
+                }
+            );
         })();
     }, [currLocation]);
 
     useEffect(() => {
-        getMonsters()
+        getMonsters();
         getUserInfo();
     }, [token]);
 
     useEffect(() => {
-        if (userInfo.monsters != null && userInfo.monsters.length !== 0) {
-            createIcons();
-        }
+        console.log('markers online :sunglasses:');
+        createIcons();
+
+        chooseCharacter();
+        console.log('went into markers use effect');
     }, [userInfo.monsters]);
 
     return (
@@ -204,12 +218,11 @@ export default function MapScreen({ route, navigation }) {
                         onPress={(e) => {
                             canInteract(e.nativeEvent.coordinate)
                                 ? setIsInRange(true)
-                                : setIsInRange(false)
-                            
+                                : setIsInRange(false);
+
                             setViewedMonster(marker);
                             setShouldShowMonster(true);
-                        }
-                        }
+                        }}
                     />
                 ))}
             </MapView>
@@ -243,6 +256,12 @@ export default function MapScreen({ route, navigation }) {
                     <Text style={styles.opTxt}>settings</Text>
                 </ActionButton.Item>
             </ActionButton>
+            {character ? (
+                <Character
+                    setCharacter={setCharacter}
+                    userInfo={userInfo}
+                />
+            ) : null}
             {shouldShowProfile ? (
                 <Profile
                     setShouldShowProfile={setShouldShowProfile}
@@ -252,16 +271,16 @@ export default function MapScreen({ route, navigation }) {
             ) : null}
             {shouldShowMonster ? (
                 <MonsterAt
-                    setShouldShowMonster = {setShouldShowMonster}
-                    viewedMonster = {viewedMonster}
-                    isInRange = {isInRange}
-                    userID = {userID}
+                    setShouldShowMonster={setShouldShowMonster}
+                    viewedMonster={viewedMonster}
+                    isInRange={isInRange}
+                    userID={userID}
                 />
             ) : null}
             {shouldShowInventory ? (
                 <Inventory
                     setShouldShowInventory={setShouldShowInventory}
-                    monsterInfo = {monstersOfUser}
+                    monsterInfo={monstersOfUser}
                 />
             ) : null}
             {shouldShowSettings ? (
