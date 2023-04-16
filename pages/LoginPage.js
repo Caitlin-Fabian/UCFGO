@@ -20,7 +20,7 @@ import ActionButton from 'react-native-action-button';
 const height = Dimensions.get('window').height;
 const width = Dimensions.get('window').width;
 
-export default function LoginPage({ navigation }) {
+export default function LoginPage({ route, navigation }) {
     const [message, setMessage] = useState('');
     const [loginUsername, setLoginUsername] = useState('');
     const [loginPassword, setLoginPassword] = useState('');
@@ -35,6 +35,9 @@ export default function LoginPage({ navigation }) {
 
     const animation = useRef(new Animated.Value(0)).current;
     const scrollView = useRef();
+
+    const {verifyText} = route.params ? route.params:"";
+
     var storage = require('../tokenStorage.js');
     var jwtDecode = require('jwt-decode');
 
@@ -69,7 +72,7 @@ export default function LoginPage({ navigation }) {
                 console.log(json);
                 if (json.error) {
                     setLoginMessage('User/Password combination incorrect');
-                } else {
+                }  else {
                     var ud;
                     console.log('Success');
                     storage.storeToken(json);
@@ -82,12 +85,18 @@ export default function LoginPage({ navigation }) {
                         .then((value) => {
                             // console.log('Horrary' + value);
                             ud = jwt_decode(value);
-                            console.log(ud);
-                            navigation.navigate('Map', {
-                                userID: ud.userID,
-                                Name: ud.Name,
-                                score: ud.Score,
-                            });
+                            if(!ud.isVerified){
+                                setLoginMessage("User Verified, please log in again!");
+                                navigation.navigate('Email',"");
+                            }
+                            else{
+                                console.log(ud);
+                                navigation.navigate('Map', {
+                                    userID: ud.userID,
+                                    Name: ud.Name,
+                                    score: ud.Score,
+                                });
+                            }
                         });
                 }
                 // if (json.id != -1) {
@@ -286,6 +295,7 @@ export default function LoginPage({ navigation }) {
                                 </Text>
                                 <TextInput
                                     style={styles.inputBox}
+                                    secureTextEntry
                                     // value={registerPassword}
                                     onChangeText={(newText) =>
                                         setRegisterPassword(newText)

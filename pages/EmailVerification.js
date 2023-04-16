@@ -15,7 +15,7 @@ const width = Dimensions.get('window').width;
 export default function EmailVerification({route, navigation}) {
     const [emailToken, setEmailToken] = useState(' ');
     const [errorMessage, setErrorMessage] = useState(' ');
-    const {userEmail} = route.params;
+    //const {userEmail} = route.params;
 
     const verifyEmail = async() => {
         await fetch('https://ucf-go.herokuapp.com/api/verify', {
@@ -49,7 +49,7 @@ export default function EmailVerification({route, navigation}) {
             <View style={styles.container}>
                 <View style={styles.form}>
                     <Text style={styles.smallText}>
-                        Verify your email by typing the code sent to {JSON.stringify(userEmail)} below:
+                        Verify your email by typing the code sent to the email provided:
                     </Text>
                     <TextInput
                         style={styles.inputBox}
