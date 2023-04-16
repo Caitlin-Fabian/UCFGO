@@ -89,7 +89,7 @@ export default function Inventory({setShouldShowInventory,monsterInfo}) {
                 </TouchableOpacity>
                 <Text style={styles.titleTxt} >{currMonster.Name}</Text>
             </View>
-            <View >
+            <View style={styles.container} >
                 <ImageBackground
                         imageStyle={{ borderRadius: 25 }}
                         style={styles.mainMonsterStyle}
@@ -107,26 +107,46 @@ export default function Inventory({setShouldShowInventory,monsterInfo}) {
 
 const styles = StyleSheet.create({
     container: {
+        top: 208,
+        position:'absolute',
         flex: 1,
-        backgroundColor: '#bebebe',
-        alignItems: 'center',
-        justifyContent: 'center',
+        width: "100%",
+        alignItems:'center',
+        // paddingHorizontal: 20,
+        // paddingVertical: 10,
+       // borderRadius: 25,
     },
-    // descriptionBackground: {
-    //     backgroundColor:"#ffffff",
-    //     top:'-35%',
-    //     height:'12%',
-    //     padding: 10
-    // },
     descriptionText: {
         padding:10,
         backgroundColor:"#ffffff",
-        position: 'absolute',
-        top: '40%',
+        top: -5,
+        height: "100%",
+        borderRadius:25,
         alignSelf: 'center',
         fontWeight: 'bold',
         fontSize: 20,
+        width:"100%"
     },
+    mainMonsterStyle: {
+        //  position: 'absolute',
+          alignItems: 'center',
+          top:0,
+          width: 500,
+          height: 500,
+          justifyContent: 'center',       
+          marginBottom: 10,
+         // borderRadius:25
+          
+      },
+      mainMonster: {
+          position: 'absolute',
+          //top:225,
+          height: "80%",
+          justifyContent: 'center',
+          alignSelf: 'center',
+          objectFit: 'contain', // Change the scale value as needed
+         // borderRadius:25
+      },
     logoContainer: {
         position: 'absolute',
         alignSelf: 'center',
@@ -150,23 +170,6 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
     },
-    mainMonsterStyle: {
-        backgroundColor: '#ffffff',
-        top:'-26%',
-        height: '80%',
-        width: '100%',
-        borderRadius:25
-        
-    },
-    mainMonster: {
-        top:0,
-        height: "80%",
-        justifyContent: 'center',
-        alignSelf: 'center',
-        objectFit: 'contain', // Change the scale value as needed
-        borderRadius:25
-    },
-
     inventoryButton: {
         height: 90,
         width: 90,
