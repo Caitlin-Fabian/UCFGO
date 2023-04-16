@@ -72,7 +72,7 @@ export default function MapScreen({ route, navigation }) {
         //await getUserInfo();
         //can now user userInfo.monsters for the users current monsters
         for (let x = 0; x < monsters.length; x++) {
-            let includes = userInfo.monsters.includes(monsters[x].id);
+            let includes = userInfo.monsters.includes(monsters[x]._id);
             if (includes && !monstersOfUser.includes(monsters[x])) {
                 setMonstersOfUser((monstersOfUser) => [
                     ...monstersOfUser,
@@ -159,7 +159,7 @@ export default function MapScreen({ route, navigation }) {
             .retrieveToken()
             .then((data) => data)
             .then((value) => {
-                console.log('Horrary' + value);
+                // console.log('Horrary' + value);
                 setToken(value);
             });
     });
