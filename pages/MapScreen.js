@@ -230,32 +230,40 @@ export default function MapScreen({ route, navigation }) {
                 style={styles.logoContainer}
                 source={require('../assets/Logo.png')}
             />
-            <ActionButton autoInactive={true}>
+            <ActionButton autoInactive={true} buttonColor='#ffc700' 
+             renderIcon={() => (
+                <Image source={require("../assets/threeBar.png") } style={styles.opImg}/>
+            )}>
                 <ActionButton.Item
                     onPress={() => {
                         setShouldShowProfile(!shouldShowProfile);
                         setShouldShowButtons(!shouldShowButtons);
                     }}
+                    buttonColor='#ffc700'
                 >
 
-                {/* <Image source={require("../assets/profile.png")}></Image>  */}
+                <Image source={require("../assets/profile.png")} style={styles.opImg}></Image> 
                 {/* <Text style={styles.opTxt}>profile</Text> */}
                 </ActionButton.Item>
+
                 <ActionButton.Item
                     onPress={() => {
                         setShouldShowInventory(!shouldShowInventory);
                         setShouldShowButtons(!shouldShowButtons);
                     }}
+                    buttonColor='#ffc700'
                 >
-                {/* <Image source={require("../assets/profile.png")}></Image>  */}
+                <Image source={require("../assets/inventory.png")} style={styles.opImg}></Image> 
                 </ActionButton.Item>
+
                 <ActionButton.Item
                     onPress={() => {
                         setShouldShowSettings(!shouldShowSettings);
                         setShouldShowButtons(!shouldShowButtons);
                     }}
+                    buttonColor='#ffc700'
                 >
-                {/* <Image source={require("../assets/settings.png")}></Image>  */}
+                <Image source={require("../assets/settings.png")} style={styles.opImg}></Image> 
                 </ActionButton.Item>
             </ActionButton>
             {character ? (
@@ -298,6 +306,12 @@ export default function MapScreen({ route, navigation }) {
 }
 
 const styles = StyleSheet.create({
+    opImg: {
+        objectFit: 'contain',
+        height: '80%',
+        weight: "80%",
+        backgroundColor:'transparent'
+    },
     container: {
         flex: 1,
         backgroundColor: '#bebebe',
