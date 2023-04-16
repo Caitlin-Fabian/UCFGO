@@ -26,11 +26,11 @@ export default function Character({ navigation, setCharacter, userInfo }) {
 
     console.log('HELLLLLLP ME');
     const chooseMale = () => {
-        setCharacter(1);
+        setCharacterNumber(1);
     };
 
     const chooseFemale = () => {
-        setCharacter(2);
+        setCharacterNumber(2);
     };
     const chooseCharacter = async () => {
         console.log(characterNumber);
@@ -106,6 +106,7 @@ export default function Character({ navigation, setCharacter, userInfo }) {
             <TouchableOpacity
                 onPress={() => {
                     console.log('Yay');
+                    chooseCharacter();
                 }}
                 style={styles.signOutContainer}
             >
