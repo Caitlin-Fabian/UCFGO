@@ -9,15 +9,28 @@ import {
     Button,
     TouchableOpacity,
 } from 'react-native';
-import monsters from "./monsters";
 import ActionButton from 'react-native-action-button';
 import MapView, { Marker } from 'react-native-maps';
 import * as Location from 'expo-location';
 import { mapStyle } from '../styles/mapStyle';
 import monsterView from './monsterView';
 
+
 export default function Inventory({setShouldShowInventory,monsterInfo}) {
-    console.log(monsterInfo);
+    const imagePath = {
+        1: require('../assets/1.png'),
+        2: require('../assets/2.png'),
+        3: require('../assets/3.png'),
+        4: require('../assets/4.png'),
+        5: require('../assets/5.png'),
+        6: require('../assets/6.png'),
+        7: require('../assets/7.png'),
+        8: require('../assets/8.png'),
+        9: require('../assets/9.png'),
+        10: require('../assets/10.png'),
+        11: require('../assets/11.png'),
+      };
+    console.log(monsterInfo[0]._id);
     const [currMonster, setCurrMonster] = useState({});
     const [monsterDescription, setMonsterDescription] = useState(false);
 
@@ -25,7 +38,6 @@ export default function Inventory({setShouldShowInventory,monsterInfo}) {
         setCurrMonster(monster);
         setMonsterDescription(true);
     }
-
     return (
         <View style={styles.greyOverlay}>
             <View style={styles.headerContainer}>
@@ -52,7 +64,7 @@ export default function Inventory({setShouldShowInventory,monsterInfo}) {
                             style={styles.monsterCard}
                             onPress={() => enterNewView(monster)}
                         >
-                            <Image style={styles.monster} source={monster.picture}/>
+                            <Image style={styles.monster} source={imagePath[monster._id]}/>
                         </TouchableOpacity>
                     </>))
 
@@ -75,7 +87,7 @@ export default function Inventory({setShouldShowInventory,monsterInfo}) {
                         source={require('../assets/BackButton.png')}
                     />
                 </TouchableOpacity>
-                <Text style={styles.titleTxt} >{currMonster.title}</Text>
+                <Text style={styles.titleTxt} >{currMonster.Name}</Text>
             </View>
             <View >
                 <ImageBackground
@@ -83,10 +95,10 @@ export default function Inventory({setShouldShowInventory,monsterInfo}) {
                         style={styles.mainMonsterStyle}
                         source={require('../assets/pokemon-background.jpg')}
                     >
-                <Image style={styles.mainMonster} source={currMonster.picture}></Image>
+                <Image style={styles.mainMonster} source={imagePath[currMonster._id]}></Image>
                 </ImageBackground>
             
-                <Text style={styles.descriptionText}>{currMonster.description}</Text>
+                <Text style={styles.descriptionText}>{currMonster.Description}</Text>
           
             </View></>)}
         </View>

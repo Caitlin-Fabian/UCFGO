@@ -13,16 +13,27 @@ import ActionButton from 'react-native-action-button';
 import MapView, { Marker } from 'react-native-maps';
 import * as Location from 'expo-location';
 import { mapStyle } from '../styles/mapStyle';
-import monsters from './monsters';
 
 export default function MonsterAt({setShouldShowMonster,viewedMonster, isInRange, userID}) {
 
-
+    const imagePath = {
+        1: require('../assets/1.png'),
+        2: require('../assets/2.png'),
+        3: require('../assets/3.png'),
+        4: require('../assets/4.png'),
+        5: require('../assets/5.png'),
+        6: require('../assets/6.png'),
+        7: require('../assets/7.png'),
+        8: require('../assets/8.png'),
+        9: require('../assets/9.png'),
+        10: require('../assets/10.png'),
+        11: require('../assets/11.png'),
+      };
     const [isMonsterInInv, setIsMonsterInInv] = useState(viewedMonster.pinColor=== '#00FF00'/*green*/ ? true: false);
     const [userGotMonster, setUserGotMonster] = useState(false);
 
     const onPressGiveMonster = async() => {
-        console.log("gimme that monster");
+        console.log("gimme that monster" + viewedMonster.picture);
         await fetch('https://ucf-go.herokuapp.com/api/giveMonster', {
         method: 'POST',
         headers: {
@@ -74,7 +85,7 @@ export default function MonsterAt({setShouldShowMonster,viewedMonster, isInRange
                 >
                         <Image
                             style={[styles.profilePicImage, !isMonsterInInv && styles.silhouette]}
-                            source={viewedMonster.picture}
+                            source={imagePath[viewedMonster.key]}
                         ></Image>
                 </ImageBackground>
                 {!isMonsterInInv && isInRange && (
