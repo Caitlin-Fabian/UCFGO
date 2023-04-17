@@ -26,41 +26,28 @@ export default function Settings({
     setShouldShowSettings,
     userInfo,
 }) {
+    const [message, setMessage] = useState('');
     const [changeSettings, setChangeSettings] = useState(true);
     const [newName, setNewName] = useState(null);
     const [newEmail, setNewEmail] = useState(null);
     const [newUsername, setNewUsername] = useState(null);
-    const [selectedCharacter, setSelectedCharacter] = useState(null);
-
-    const [chosen1, setChosen1] = useState(false);
-    const [chosen2, setChosen2] = useState(true);
+    const [selectedCharacter, setSelectedCharacter] = useState(1);
 
     const doLogout = () => {
         navigation.navigate('Login');
         AsyncStorage.removeItem('token_data');
     };
 
-    const chooseMale = () => {
-        setNewCharacter(1);
-        setChosen1(true);
-        setChosen2(false);
-    };
-
-    const chooseFemale = () => {
-        setNewCharacter(2);
-        setChosen2(true);
-        setChosen1(false);
-    };
-
     const handleSave = async () => {
-        console.log(characterNumber);
         let js = JSON.stringify({
-            character: newCharacter,
+            character: selectedCharacter,
             name: newName,
             username: newUsername,
             userId: userInfo.id,
             email: newEmail,
         });
+
+        console.log(js);
 
         await fetch('https://ucf-go.herokuapp.com/api/updateUser', {
             method: 'POST',
@@ -73,15 +60,28 @@ export default function Settings({
             .then((response) => response.json())
             .then((json) => {
                 console.log(json);
-                if (json.error) {
-                    setMessage('API IS NOT WORKING');
+                if (json.error == '') {
+                    console.log('It updated');
+                    setChangeSettings(true);
+                    navigation.navigate('Map', {
+                        userID: userInfo.id,
+                        Name: userInfo.Name,
+                        score: userInfo.Score,
+                    });
+                    forceUpdate;
+                    setMessage('Updated Successfully');
                 } else {
-                    changeSettings(false);
+                    setMessage('User or Email Already Exists');
                 }
             })
             .catch((error) => {
                 console.error(error);
             });
+    };
+    const handleSelected = (character) => {
+        parseInt(character);
+        console.log(character);
+        setSelectedCharacter(character);
     };
 
     console.log('hello');
@@ -106,6 +106,16 @@ export default function Settings({
             </View>
             {changeSettings ? (
                 <>
+                    <Text
+                        style={{
+                            display: 'flex',
+                            textAlign: 'center',
+                            top: 600,
+                            color: 'white',
+                        }}
+                    >
+                        {message}
+                    </Text>
                     <TouchableOpacity
                         style={styles.changePasswordContainer}
                         onPress={() => {
@@ -142,7 +152,7 @@ export default function Settings({
                             style={styles.changeNameInput}
                             onChangeText={setNewName}
                             value={newName}
-                            placeholder={userInfo.name}
+                            placeholder={userInfo.Name}
                         />
                         <Text
                             style={{
@@ -156,7 +166,7 @@ export default function Settings({
                             style={styles.changeNameInput}
                             onChangeText={setNewEmail}
                             value={newEmail}
-                            placeholder={userInfo.email}
+                            placeholder={userInfo.Email}
                         />
                         <Text
                             style={{
@@ -173,19 +183,33 @@ export default function Settings({
                             placeholder={userInfo.username}
                         />
                         <View>
+                            <Text style={{ color: 'white' }}>
+                                Character One
+                            </Text>
                             <Image
                                 style={styles.character1}
                                 source={require('../assets/boy.png')}
                             ></Image>
+                            <Text
+                                style={{
+                                    color: 'white',
+                                    position: 'absolute',
+                                    right: 0,
+                                }}
+                            >
+                                Character Two
+                            </Text>
+
                             <Image
                                 style={styles.character2}
                                 source={require('../assets/girl.png')}
                             ></Image>
+
                             <Picker
                                 selectedValue={selectedCharacter}
                                 itemStyle={{ color: 'white', top: -40 }}
                                 onValueChange={(itemValue, itemIndex) =>
-                                    setSelectedCharacter(itemValue)
+                                    handleSelected({ itemValue })
                                 }
                             >
                                 <Picker.Item
@@ -197,11 +221,19 @@ export default function Settings({
                                     value="2"
                                 />
                             </Picker>
+                            <Text
+                                style={{
+                                    color: 'white',
+                                    textAlign: 'center',
+                                }}
+                            >
+                                {message}
+                            </Text>
                         </View>
                     </View>
                     <TouchableOpacity
                         onPress={() => {
-                            doLogout();
+                            handleSave();
                         }}
                         style={styles.signOutContainer}
                     >
@@ -385,12 +417,16 @@ const styles = StyleSheet.create({
         position: 'absolute',
         objectFit: 'contain',
         width: '50%',
-        height: '50%',
+        height: '70%',
+        left: -40,
+        top: 10,
     },
     character2: {
+        position: 'absolute',
         width: '50%',
-        height: '50%',
-        left: 150,
+        height: '70%',
+        left: 200,
+        top: 10,
         objectFit: 'contain',
     },
     overlay1: {

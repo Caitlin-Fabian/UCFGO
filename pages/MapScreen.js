@@ -185,7 +185,7 @@ export default function MapScreen({ route, navigation }) {
     useEffect(() => {
         getMonsters();
         getUserInfo();
-    }, [token]);
+    }, [token, userInfo]);
 
     useEffect(() => {
         console.log('markers online :sunglasses:');

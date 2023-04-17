@@ -16,7 +16,7 @@ import { mapStyle } from '../styles/mapStyle';
 
 export default function Profile({ setShouldShowProfile, userID, userInfo }) {
     const getCharacter = () => {
-        if (userInfo.character === 2) {
+        if (userInfo.character == 2) {
             setCharacter(true);
         } else {
             setCharacter(false);
