@@ -1,6 +1,8 @@
 import { StatusBar } from 'expo-status-bar';
 import React, { useEffect, useState } from 'react';
 import { LogBox } from 'react-native';
+import { Picker } from '@react-native-picker/picker';
+
 import {
     StyleSheet,
     Text,
@@ -9,6 +11,7 @@ import {
     Button,
     Pressable,
     TextInput,
+    TouchableHighlight,
     TouchableOpacity,
 } from 'react-native';
 import ActionButton from 'react-native-action-button';
@@ -24,12 +27,61 @@ export default function Settings({
     userInfo,
 }) {
     const [changeSettings, setChangeSettings] = useState(true);
-    const [name, setName] = useState('');
-    const [email, setEmail] = useState('');
+    const [newName, setNewName] = useState(null);
+    const [newEmail, setNewEmail] = useState(null);
+    const [newUsername, setNewUsername] = useState(null);
+    const [selectedCharacter, setSelectedCharacter] = useState(null);
+
+    const [chosen1, setChosen1] = useState(false);
+    const [chosen2, setChosen2] = useState(true);
 
     const doLogout = () => {
         navigation.navigate('Login');
         AsyncStorage.removeItem('token_data');
+    };
+
+    const chooseMale = () => {
+        setNewCharacter(1);
+        setChosen1(true);
+        setChosen2(false);
+    };
+
+    const chooseFemale = () => {
+        setNewCharacter(2);
+        setChosen2(true);
+        setChosen1(false);
+    };
+
+    const handleSave = async () => {
+        console.log(characterNumber);
+        let js = JSON.stringify({
+            character: newCharacter,
+            name: newName,
+            username: newUsername,
+            userId: userInfo.id,
+            email: newEmail,
+        });
+
+        await fetch('https://ucf-go.herokuapp.com/api/updateUser', {
+            method: 'POST',
+            headers: {
+                Accept: 'application/json',
+                'Content-Type': 'application/json',
+            },
+            body: js,
+        })
+            .then((response) => response.json())
+            .then((json) => {
+                console.log(json);
+                if (json.error) {
+                    setMessage('API IS NOT WORKING');
+                } else {
+                    changeSettings(false);
+                }
+            })
+            .catch((error) => {
+                console.error(error);
+            });
     };
 
     console.log('hello');
@@ -88,8 +140,9 @@ export default function Settings({
                         </Text>
                         <TextInput
                             style={styles.changeNameInput}
-                            onChangeText={setName}
-                            value={name}
+                            onChangeText={setNewName}
+                            value={newName}
+                            placeholder={userInfo.name}
                         />
                         <Text
                             style={{
@@ -101,9 +154,50 @@ export default function Settings({
                         </Text>
                         <TextInput
                             style={styles.changeNameInput}
-                            onChangeText={setName}
-                            value={name}
+                            onChangeText={setNewEmail}
+                            value={newEmail}
+                            placeholder={userInfo.email}
                         />
+                        <Text
+                            style={{
+                                fontSize: 20,
+                                color: '#fff',
+                            }}
+                        >
+                            UserName:
+                        </Text>
+                        <TextInput
+                            style={styles.changeNameInput}
+                            onChangeText={setNewUsername}
+                            value={newUsername}
+                            placeholder={userInfo.username}
+                        />
+                        <View>
+                            <Image
+                                style={styles.character1}
+                                source={require('../assets/boy.png')}
+                            ></Image>
+                            <Image
+                                style={styles.character2}
+                                source={require('../assets/girl.png')}
+                            ></Image>
+                            <Picker
+                                selectedValue={selectedCharacter}
+                                itemStyle={{ color: 'white', top: -40 }}
+                                onValueChange={(itemValue, itemIndex) =>
+                                    setSelectedCharacter(itemValue)
+                                }
+                            >
+                                <Picker.Item
+                                    label="Character 1"
+                                    value="1"
+                                />
+                                <Picker.Item
+                                    label="Character 2"
+                                    value="2"
+                                />
+                            </Picker>
+                        </View>
                     </View>
                     <TouchableOpacity
                         onPress={() => {
@@ -271,13 +365,10 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     editingContainer: {
-        top: 300,
+        top: 200,
         alignSelf: 'center',
         width: '80%',
         height: '30%',
-        borderRadius: 10,
-        justifyContent: 'center',
-        alignItems: 'center',
     },
     changeNameInput: {
         height: 40,
@@ -289,5 +380,30 @@ const styles = StyleSheet.create({
     map: {
         width: '100%',
         height: '100%',
+    },
+    character1: {
+        position: 'absolute',
+        objectFit: 'contain',
+        width: '50%',
+        height: '50%',
+    },
+    character2: {
+        width: '50%',
+        height: '50%',
+        left: 150,
+        objectFit: 'contain',
+    },
+    overlay1: {
+        position: 'absolute',
+        width: '50%',
+        backgroundColor: 'rgba(0,0,0,0.5)',
+        resizeMode: 'cover',
+    },
+    overlay2: {
+        width: '50%',
+        left: 100,
+        resizeMode: 'cover',
+        ...StyleSheet.absoluteFillObject,
+        backgroundColor: 'rgba(0,0,0,0.5)',
     },
 });
