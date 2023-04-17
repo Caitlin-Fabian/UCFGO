@@ -7,7 +7,6 @@ import {
     ScrollView,
     Image,
     TextInput,
-    Pressable,
     TouchableOpacity,
     ImageBackground,
     Dimensions,
@@ -148,12 +147,12 @@ export default function LoginPage({ route, navigation }) {
                 console.log(res);
                 try {
                     json = JSON.parse(res);
-                    console.log(json.error);
-                    if (json.error == 'N/A') {
+
+                    if (json.id !== -1) {
                         console.log('Register success');
-                        var emailJson = {
-                            userEmail: registerEmail,
-                        };
+                        let emailJson = {
+                            userEmail: registerEmail
+                        }
                         setRegisterMessage('User registered successfully');
                         setRegisterUsername('');
                         setRegisterPassword('');
@@ -285,7 +284,7 @@ export default function LoginPage({ route, navigation }) {
                                 </Text>
                                 <TextInput
                                     style={styles.inputBox}
-                                    // value={registerUsername}
+                                    value={registerUsername}
                                     onChangeText={(newText) =>
                                         setRegisterUsername(newText)
                                     }
@@ -296,7 +295,7 @@ export default function LoginPage({ route, navigation }) {
                                 <TextInput
                                     style={styles.inputBox}
                                     secureTextEntry
-                                    // value={registerPassword}
+                                    value={registerPassword}
                                     onChangeText={(newText) =>
                                         setRegisterPassword(newText)
                                     }
@@ -304,7 +303,7 @@ export default function LoginPage({ route, navigation }) {
                                 <Text style={styles.inputBoxText}>Name:</Text>
                                 <TextInput
                                     style={styles.inputBox}
-                                    //  value={registerName}
+                                    value={registerName}
                                     onChangeText={(newText) =>
                                         setRegisterName(newText)
                                     }
@@ -312,11 +311,12 @@ export default function LoginPage({ route, navigation }) {
                                 <Text style={styles.inputBoxText}>Email:</Text>
                                 <TextInput
                                     style={styles.inputBox}
-                                    // value={registerEmail}
+                                    value={registerEmail}
                                     onChangeText={(newText) =>
                                         setRegisterEmail(newText)
                                     }
                                 />
+
                             </ScrollView>
                             <Text style={styles.smallText}>
                                 Already have an account?{' '}

@@ -6,7 +6,7 @@ import {
   TextInput,
   ImageBackground,
   Dimensions,
-  Pressable
+  TouchableOpacity
 } from 'react-native';
 
 const height = Dimensions.get('window').height;
@@ -57,14 +57,14 @@ export default function EmailVerification({route, navigation}) {
                             setEmailToken(newText)
                         }
                     />
-                    <Pressable
+                    <TouchableOpacity
                         onPress={verifyEmail}
                         style={styles.loginButton}
                     >
                         <Text style={styles.loginButtonText}>
                             Confirm
                         </Text>
-                    </Pressable>
+                    </TouchableOpacity>
                     <Text style={styles.smallText}>
                         {errorMessage}
                     </Text>
