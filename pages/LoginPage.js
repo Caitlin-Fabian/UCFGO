@@ -160,6 +160,7 @@ export default function LoginPage({ route, navigation }) {
                         setRegisterName('');
                         setRegisterEmail('');
                         navigation.navigate('Email', emailJson);
+                        scrollView.current.scrollTo({ x: 0 });
                     } else {
                         console.log('Register failure');
                         setRegisterMessage('User invalid');
