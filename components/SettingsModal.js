@@ -1,6 +1,8 @@
 import { StatusBar } from 'expo-status-bar';
 import React, { useEffect, useState } from 'react';
 import { LogBox } from 'react-native';
+import { Picker } from '@react-native-picker/picker';
+
 import {
     StyleSheet,
     Text,
@@ -9,6 +11,7 @@ import {
     Button,
     Pressable,
     TextInput,
+    TouchableHighlight,
     TouchableOpacity,
 } from 'react-native';
 import ActionButton from 'react-native-action-button';
@@ -23,13 +26,62 @@ export default function Settings({
     setShouldShowSettings,
     userInfo,
 }) {
+    const [message, setMessage] = useState('');
     const [changeSettings, setChangeSettings] = useState(true);
-    const [name, setName] = useState('');
-    const [email, setEmail] = useState('');
+    const [newName, setNewName] = useState(null);
+    const [newEmail, setNewEmail] = useState(null);
+    const [newUsername, setNewUsername] = useState(null);
+    const [selectedCharacter, setSelectedCharacter] = useState(1);
 
     const doLogout = () => {
         navigation.navigate('Login');
         AsyncStorage.removeItem('token_data');
+    };
+
+    const handleSave = async () => {
+        let js = JSON.stringify({
+            character: selectedCharacter,
+            name: newName,
+            username: newUsername,
+            userId: userInfo.id,
+            email: newEmail,
+        });
+
+        console.log(js);
+
+        await fetch('https://ucf-go.herokuapp.com/api/updateUser', {
+            method: 'POST',
+            headers: {
+                Accept: 'application/json',
+                'Content-Type': 'application/json',
+            },
+            body: js,
+        })
+            .then((response) => response.json())
+            .then((json) => {
+                console.log(json);
+                if (json.error == '') {
+                    console.log('It updated');
+                    setChangeSettings(true);
+                    navigation.navigate('Map', {
+                        userID: userInfo.id,
+                        Name: userInfo.Name,
+                        score: userInfo.Score,
+                    });
+                    forceUpdate;
+                    setMessage('Updated Successfully');
+                } else {
+                    setMessage('User or Email Already Exists');
+                }
+            })
+            .catch((error) => {
+                console.error(error);
+            });
+    };
+    const handleSelected = (character) => {
+        parseInt(character);
+        console.log(character);
+        setSelectedCharacter(character);
     };
 
     console.log('hello');
@@ -54,6 +106,16 @@ export default function Settings({
             </View>
             {changeSettings ? (
                 <>
+                    <Text
+                        style={{
+                            display: 'flex',
+                            textAlign: 'center',
+                            top: 600,
+                            color: 'white',
+                        }}
+                    >
+                        {message}
+                    </Text>
                     <TouchableOpacity
                         style={styles.changePasswordContainer}
                         onPress={() => {
@@ -88,8 +150,9 @@ export default function Settings({
                         </Text>
                         <TextInput
                             style={styles.changeNameInput}
-                            onChangeText={setName}
-                            value={name}
+                            onChangeText={setNewName}
+                            value={newName}
+                            placeholder={userInfo.Name}
                         />
                         <Text
                             style={{
@@ -101,13 +164,76 @@ export default function Settings({
                         </Text>
                         <TextInput
                             style={styles.changeNameInput}
-                            onChangeText={setName}
-                            value={name}
+                            onChangeText={setNewEmail}
+                            value={newEmail}
+                            placeholder={userInfo.Email}
                         />
+                        <Text
+                            style={{
+                                fontSize: 20,
+                                color: '#fff',
+                            }}
+                        >
+                            UserName:
+                        </Text>
+                        <TextInput
+                            style={styles.changeNameInput}
+                            onChangeText={setNewUsername}
+                            value={newUsername}
+                            placeholder={userInfo.username}
+                        />
+                        <View>
+                            <Text style={{ color: 'white' }}>
+                                Character One
+                            </Text>
+                            <Image
+                                style={styles.character1}
+                                source={require('../assets/boy.png')}
+                            ></Image>
+                            <Text
+                                style={{
+                                    color: 'white',
+                                    position: 'absolute',
+                                    right: 0,
+                                }}
+                            >
+                                Character Two
+                            </Text>
+
+                            <Image
+                                style={styles.character2}
+                                source={require('../assets/girl.png')}
+                            ></Image>
+
+                            <Picker
+                                selectedValue={selectedCharacter}
+                                itemStyle={{ color: 'white', top: -40 }}
+                                onValueChange={(itemValue, itemIndex) =>
+                                    handleSelected({ itemValue })
+                                }
+                            >
+                                <Picker.Item
+                                    label="Character 1"
+                                    value="1"
+                                />
+                                <Picker.Item
+                                    label="Character 2"
+                                    value="2"
+                                />
+                            </Picker>
+                            <Text
+                                style={{
+                                    color: 'white',
+                                    textAlign: 'center',
+                                }}
+                            >
+                                {message}
+                            </Text>
+                        </View>
                     </View>
                     <TouchableOpacity
                         onPress={() => {
-                            doLogout();
+                            handleSave();
                         }}
                         style={styles.signOutContainer}
                     >
@@ -271,13 +397,10 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     editingContainer: {
-        top: 300,
+        top: 200,
         alignSelf: 'center',
         width: '80%',
         height: '30%',
-        borderRadius: 10,
-        justifyContent: 'center',
-        alignItems: 'center',
     },
     changeNameInput: {
         height: 40,
@@ -289,5 +412,34 @@ const styles = StyleSheet.create({
     map: {
         width: '100%',
         height: '100%',
+    },
+    character1: {
+        position: 'absolute',
+        objectFit: 'contain',
+        width: '50%',
+        height: '70%',
+        left: -40,
+        top: 10,
+    },
+    character2: {
+        position: 'absolute',
+        width: '50%',
+        height: '70%',
+        left: 200,
+        top: 10,
+        objectFit: 'contain',
+    },
+    overlay1: {
+        position: 'absolute',
+        width: '50%',
+        backgroundColor: 'rgba(0,0,0,0.5)',
+        resizeMode: 'cover',
+    },
+    overlay2: {
+        width: '50%',
+        left: 100,
+        resizeMode: 'cover',
+        ...StyleSheet.absoluteFillObject,
+        backgroundColor: 'rgba(0,0,0,0.5)',
     },
 });

@@ -214,7 +214,7 @@ export default function MapScreen({ route, navigation }) {
     useEffect(() => {
         getMonsters();
         getUserInfo();
-    }, [token]);
+    }, [token, userInfo]);
 
     useEffect(() => {
         if(first){

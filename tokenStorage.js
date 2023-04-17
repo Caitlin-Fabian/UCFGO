@@ -3,7 +3,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 exports.storeToken = function (tok) {
     try {
         AsyncStorage.setItem('token_data', tok.accessToken);
-        console.log('Access token Hello: **** ' + tok.accessToken);
+        // console.log('Access token Hello: **** ' + tok.accessToken);
         // console.log(tok.accessToken);
     } catch (e) {
         console.log(e.message);
