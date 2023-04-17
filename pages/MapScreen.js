@@ -13,13 +13,26 @@ import ActionButton from 'react-native-action-button';
 import MapView, { Marker } from 'react-native-maps';
 import * as Location from 'expo-location';
 import { mapStyle } from '../styles/mapStyle';
-import monsters from '../components/monsters';
 import Profile from '../components/ProfileModal';
+import MonsterAt from '../components/MonsterAtModal';
 import Inventory from '../components/InventoryModal';
 import Settings from '../components/SettingsModal';
-
+import Character from '../components/Character';
 
 export default function MapScreen({ route, navigation }) {
+    const imagePath = {
+        1: require('../assets/1.png'),
+        2: require('../assets/2.png'),
+        3: require('../assets/3.png'),
+        4: require('../assets/4.png'),
+        5: require('../assets/5.png'),
+        6: require('../assets/6.png'),
+        7: null, //require('../assets/7.png'),
+        8: null, //require('../assets/8.png'),
+        9: require('../assets/9.png'),
+        10: require('../assets/10.png'),
+        11: null, //require('../assets/11.png'),
+    };
     const { userID, Name, Score } = route.params;
     var storage = require('../tokenStorage.js');
 
@@ -27,11 +40,17 @@ export default function MapScreen({ route, navigation }) {
     const [shouldShowProfile, setShouldShowProfile] = useState(false);
     const [shouldShowInventory, setShouldShowInventory] = useState(false);
     const [shouldShowSettings, setShouldShowSettings] = useState(false);
-    const [shouldBack, setShouldBack] = useState(false);
     const [message, setMessage] = useState('');
     const [userInfo, setUserInfo] = useState({});
     const [icons, setIcons] = useState([]);
+    const [character, setCharacter] = useState(false);
+    const [monstersOfUser, setMonstersOfUser] = useState([]);
+    const [shouldShowMonster, setShouldShowMonster] = useState(false);
+    const [shouldBack, setShouldBack] = useState(false);
     const [ran, setRan] = useState(false);
+    const [monsters, setMonsters] = useState([]);
+    const [viewedMonster, setViewedMonster] = useState(null);
+    const [isInRange, setIsInRange] = useState(null);
 
     const [token, setToken] = useState('');
     const [currLocation, setCurrLocation] = useState({
@@ -52,15 +71,26 @@ export default function MapScreen({ route, navigation }) {
         let locations = [];
         //await getUserInfo();
         //can now user userInfo.monsters for the users current monsters
-
         for (let x = 0; x < monsters.length; x++) {
+            let includes = userInfo.monsters.includes(monsters[x]._id);
+            if (includes && !monstersOfUser.includes(monsters[x])) {
+                setMonstersOfUser((monstersOfUser) => [
+                    ...monstersOfUser,
+                    monsters[x],
+                ]);
+            }
+            //monsters[x].push({picture: imagePath[monsters[x]._id],})
             locations.push({
-                key: monsters[x].id,
-                pos: monsters[x].pos,
-                pinColor: userInfo.monsters.includes(monsters[x].id)
-                    ? /*green*/ '#00FF00'
-                    : /*red*/ 'FF0000',
+                key: monsters[x]._id,
+                pos: {
+                    latitude: parseFloat(monsters[x].lat),
+                    longitude: parseFloat(monsters[x].lng),
+                },
+                pinColor: includes ? /*green*/ '#00FF00' : /*red*/ 'FF0000',
+                picture: imagePath[monsters[x]._id],
+                title: monsters[x].Name,
             });
+            console.log('pos' + locations[x].picture);
         }
         setIcons(locations);
     };
@@ -97,13 +127,39 @@ export default function MapScreen({ route, navigation }) {
                 console.error(error);
             });
     };
+
+    const chooseCharacter = () => {
+        if (userInfo.character == 0) {
+            setCharacter(true);
+        }
+    };
+    const getMonsters = async () => {
+        console.log('Token: ' + token);
+
+        await fetch('https://ucf-go.herokuapp.com/api/getMonsterList', {
+            method: 'POST',
+            headers: {
+                Accept: 'application/json',
+                'Content-Type': 'application/json',
+            },
+        })
+            .then((response) => response.json())
+            .then((json) => {
+                console.log(json.monsterList);
+                setMonsters(json.monsterList);
+            })
+            .catch((error) => {
+                console.error(error);
+            });
+    };
+
     useEffect(() => {
         LogBox.ignoreLogs(['Animated: `useNativeDriver`']);
         storage
             .retrieveToken()
             .then((data) => data)
             .then((value) => {
-                console.log('Horrary' + value);
+                // console.log('Horrary' + value);
                 setToken(value);
             });
     });
@@ -117,22 +173,26 @@ export default function MapScreen({ route, navigation }) {
             }
 
             let location = await Location.getCurrentPositionAsync({});
-            await new Promise((resolve) => setTimeout(resolve, 1000)).then(() =>
-                setCurrLocation(location)
+            await new Promise((resolve) => setTimeout(resolve, 500)).then(
+                () => {
+                    setCurrLocation(location);
+                    console.log('location ping');
+                }
             );
         })();
     }, [currLocation]);
 
     useEffect(() => {
+        getMonsters();
         getUserInfo();
-    }, []);
+    }, [token]);
 
     useEffect(() => {
-        if (userInfo.monsters != null && userInfo.monsters.length !== 0) {
-            console.log("markers online :sunglasses:")
-            createIcons();
-        }
-        console.log("went into markers use effect")
+        console.log('markers online :sunglasses:');
+        createIcons();
+
+        chooseCharacter();
+        console.log('went into markers use effect');
     }, [userInfo.monsters]);
 
     return (
@@ -152,17 +212,17 @@ export default function MapScreen({ route, navigation }) {
             >
                 {icons.map((marker) => (
                     <Marker
-                        coordinate={{
-                            latitude: marker.pos.lat,
-                            longitude: marker.pos.lng,
-                        }}
+                        coordinate={marker.pos}
                         pinColor={marker.pinColor}
                         key={marker.key}
-                        onPress={(e) =>
+                        onPress={(e) => {
                             canInteract(e.nativeEvent.coordinate)
-                                ? console.log('close enough')
-                                : console.log('not close enough')
-                        }
+                                ? setIsInRange(true)
+                                : setIsInRange(false);
+
+                            setViewedMonster(marker);
+                            setShouldShowMonster(true);
+                        }}
                     />
                 ))}
             </MapView>
@@ -170,32 +230,48 @@ export default function MapScreen({ route, navigation }) {
                 style={styles.logoContainer}
                 source={require('../assets/Logo.png')}
             />
-            <ActionButton autoInactive={true}>
+            <ActionButton autoInactive={true} buttonColor='#ffc700' 
+             renderIcon={() => (
+                <Image source={require("../assets/threeBar.png") } style={styles.opImg}/>
+            )}>
                 <ActionButton.Item
                     onPress={() => {
                         setShouldShowProfile(!shouldShowProfile);
                         setShouldShowButtons(!shouldShowButtons);
                     }}
+                    buttonColor='#ffc700'
                 >
-                    <Text style={styles.opTxt}>profile</Text>
+
+                <Image source={require("../assets/profile.png")} style={styles.opImg}></Image> 
+                {/* <Text style={styles.opTxt}>profile</Text> */}
                 </ActionButton.Item>
+
                 <ActionButton.Item
                     onPress={() => {
                         setShouldShowInventory(!shouldShowInventory);
                         setShouldShowButtons(!shouldShowButtons);
                     }}
+                    buttonColor='#ffc700'
                 >
-                    <Text style={styles.opTxt}>inventory</Text>
+                <Image source={require("../assets/inventory.png")} style={styles.opImg}></Image> 
                 </ActionButton.Item>
+
                 <ActionButton.Item
                     onPress={() => {
-                        setShouldShowSettings(!shouldShowProfile);
+                        setShouldShowSettings(!shouldShowSettings);
                         setShouldShowButtons(!shouldShowButtons);
                     }}
+                    buttonColor='#ffc700'
                 >
-                    <Text style={styles.opTxt}>settings</Text>
+                <Image source={require("../assets/settings.png")} style={styles.opImg}></Image> 
                 </ActionButton.Item>
             </ActionButton>
+            {character ? (
+                <Character
+                    setCharacter={setCharacter}
+                    userInfo={userInfo}
+                />
+            ) : null}
             {shouldShowProfile ? (
                 <Profile
                     setShouldShowProfile={setShouldShowProfile}
@@ -203,10 +279,18 @@ export default function MapScreen({ route, navigation }) {
                     userInfo={userInfo}
                 />
             ) : null}
+            {shouldShowMonster ? (
+                <MonsterAt
+                    setShouldShowMonster={setShouldShowMonster}
+                    viewedMonster={viewedMonster}
+                    isInRange={isInRange}
+                    userID={userID}
+                />
+            ) : null}
             {shouldShowInventory ? (
                 <Inventory
                     setShouldShowInventory={setShouldShowInventory}
-                   // monsterInfo = {userInfo.monsters}
+                    monsterInfo={monstersOfUser}
                 />
             ) : null}
             {shouldShowSettings ? (
@@ -222,6 +306,12 @@ export default function MapScreen({ route, navigation }) {
 }
 
 const styles = StyleSheet.create({
+    opImg: {
+        objectFit: 'contain',
+        height: '80%',
+        weight: "80%",
+        backgroundColor:'transparent'
+    },
     container: {
         flex: 1,
         backgroundColor: '#bebebe',
