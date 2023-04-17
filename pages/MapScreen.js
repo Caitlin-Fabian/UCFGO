@@ -51,16 +51,18 @@ export default function MapScreen({ route, navigation }) {
     const [monsters, setMonsters] = useState([]);
     const [viewedMonster, setViewedMonster] = useState(null);
     const [isInRange, setIsInRange] = useState(null);
-
+    const [prodMarkers, setProdMarkers] = useState([]);
     const [token, setToken] = useState('');
+    const [first, setFirst] = useState(true);
+
     const [currLocation, setCurrLocation] = useState({
-        coords: { latitude: 28.60160681694149, longitude: -81.20044675481425 },
+        coords: { latitude: 28, longitude: -81 },
     });
 
     function canInteract(coords) {
         const distance = Math.sqrt(
             Math.pow(coords.latitude - currLocation.coords.latitude, 2) +
-                Math.pow(coords.longitude - currLocation.coords.longitude, 2)
+            Math.pow(coords.longitude - currLocation.coords.longitude, 2)
         );
         if (distance <= 0.0008) return true;
         else return false;
@@ -69,37 +71,62 @@ export default function MapScreen({ route, navigation }) {
     //creates the icons of the monster locations
     const createIcons = async () => {
         let locations = [];
-        //await getUserInfo();
+        await getUserInfo();
+        await getMonsters();
+         getUserLocation();
+        let newPush = [];
         //can now user userInfo.monsters for the users current monsters
         for (let x = 0; x < monsters.length; x++) {
             let includes = userInfo.monsters.includes(monsters[x]._id);
-            if (includes && !monstersOfUser.includes(monsters[x])) {
-                setMonstersOfUser((monstersOfUser) => [
-                    ...monstersOfUser,
-                    monsters[x],
-                ]);
+            if (includes) {
+                newPush.push(monsters[x]);
+            }
+            let pos = {
+                latitude: parseFloat(monsters[x].lat),
+                longitude: parseFloat(monsters[x].lng),
+            }
+            let pc = ""//red default
+            if (includes) {
+                pc = '#00FF00';//green
+            }
+            else if (canInteract(pos)) {
+                pc = ''//yellow
+                pc = "#FFFF00"
+            }
+            else {
+                pc = '#FF0000'
             }
             //monsters[x].push({picture: imagePath[monsters[x]._id],})
             locations.push({
                 key: monsters[x]._id,
-                pos: {
-                    latitude: parseFloat(monsters[x].lat),
-                    longitude: parseFloat(monsters[x].lng),
-                },
-                pinColor: includes ? /*green*/ '#00FF00' : /*red*/ 'FF0000',
+                pos: pos,
+                pinColor: pc,
                 picture: imagePath[monsters[x]._id],
                 title: monsters[x].Name,
             });
-            console.log('pos' + locations[x].picture);
+            //console.log('pos' + locations[x].picture);
         }
-        setIcons(locations);
+        if (locations.length !== 0) {
+            console.log("loc" + locations.length);
+            setMonstersOfUser(newPush);
+            setIcons(locations);
+        }
+    }
+
+    const createIconsWait = async () => {
+        // console.log("update check");
+        await new Promise((resolve) => setTimeout(resolve, 1000)).then(
+            async () => {
+                createIcons();
+            })
+
     };
 
     // user to retrieve user info
     // In: UserID, jwtToken
     // Out: everything lol
     const getUserInfo = async () => {
-        console.log('Token: ' + token);
+        //('Token: ' + token);
         let js = JSON.stringify({
             userId: userID,
             jwtToken: token,
@@ -115,11 +142,11 @@ export default function MapScreen({ route, navigation }) {
         })
             .then((response) => response.json())
             .then((json) => {
-                console.log(json);
+                //console.log(json);
                 if (json.error) {
                     setMessage('API IS NOT WORKING');
                 } else {
-                    console.log(json);
+                    //console.log(json);
                     setUserInfo(json);
                 }
             })
@@ -134,7 +161,7 @@ export default function MapScreen({ route, navigation }) {
         }
     };
     const getMonsters = async () => {
-        console.log('Token: ' + token);
+        //console.log('Token: ' + token);
 
         await fetch('https://ucf-go.herokuapp.com/api/getMonsterList', {
             method: 'POST',
@@ -145,7 +172,7 @@ export default function MapScreen({ route, navigation }) {
         })
             .then((response) => response.json())
             .then((json) => {
-                console.log(json.monsterList);
+                // console.log(json.monsterList);
                 setMonsters(json.monsterList);
             })
             .catch((error) => {
@@ -164,23 +191,25 @@ export default function MapScreen({ route, navigation }) {
             });
     });
 
-    useEffect(() => {
-        (async () => {
-            let { status } = await Location.requestForegroundPermissionsAsync();
-            if (status !== 'granted') {
-                setErrorMsg('Permission to access location was denied');
-                return;
-            }
+    const getUserLocation = async() => {
+        let { status } = await Location.requestForegroundPermissionsAsync();
+        if (status !== 'granted') {
+            setErrorMsg('Permission to access location was denied');
+            return;
+        }
 
-            let location = await Location.getCurrentPositionAsync({});
-            await new Promise((resolve) => setTimeout(resolve, 500)).then(
-                () => {
-                    setCurrLocation(location);
-                    console.log('location ping');
-                }
-            );
-        })();
-    }, [currLocation]);
+        let location = await Location.getCurrentPositionAsync({});
+       
+        setCurrLocation(location);
+        //console.log('location ping' + currLocation.coords.latitude);
+            
+    }
+
+    // useEffect(() => {
+    //     (async () => {
+           
+    //     })();
+    // }, [currLocation]);
 
     useEffect(() => {
         getMonsters();
@@ -188,11 +217,15 @@ export default function MapScreen({ route, navigation }) {
     }, [token]);
 
     useEffect(() => {
-        console.log('markers online :sunglasses:');
-        createIcons();
-
+        if(first){
+            createIcons();
+            setFirst(false);
+        } else {
+            createIconsWait();
+        }
+        
         chooseCharacter();
-        console.log('went into markers use effect');
+        //('went into markers use effect');
     }, [userInfo.monsters]);
 
     return (
@@ -230,10 +263,13 @@ export default function MapScreen({ route, navigation }) {
                 style={styles.logoContainer}
                 source={require('../assets/Logo.png')}
             />
-            <ActionButton autoInactive={true} buttonColor='#ffc700' 
-             renderIcon={() => (
-                <Image source={require("../assets/threeBar.png") } style={styles.opImg}/>
-            )}>
+            {icons.length===0 && (
+                <Text style= {styles.titleTxt}>Loading...</Text>
+            )}
+            <ActionButton autoInactive={true} buttonColor='#ffc700'
+                renderIcon={() => (
+                    <Image source={require("../assets/threeBar.png")} style={styles.opImg} />
+                )}>
                 <ActionButton.Item
                     onPress={() => {
                         setShouldShowProfile(!shouldShowProfile);
@@ -242,8 +278,8 @@ export default function MapScreen({ route, navigation }) {
                     buttonColor='#ffc700'
                 >
 
-                <Image source={require("../assets/profile.png")} style={styles.opImg}></Image> 
-                {/* <Text style={styles.opTxt}>profile</Text> */}
+                    <Image source={require("../assets/profile.png")} style={styles.opImg}></Image>
+                    {/* <Text style={styles.opTxt}>profile</Text> */}
                 </ActionButton.Item>
 
                 <ActionButton.Item
@@ -253,7 +289,7 @@ export default function MapScreen({ route, navigation }) {
                     }}
                     buttonColor='#ffc700'
                 >
-                <Image source={require("../assets/inventory.png")} style={styles.opImg}></Image> 
+                    <Image source={require("../assets/inventory.png")} style={styles.opImg}></Image>
                 </ActionButton.Item>
 
                 <ActionButton.Item
@@ -263,7 +299,7 @@ export default function MapScreen({ route, navigation }) {
                     }}
                     buttonColor='#ffc700'
                 >
-                <Image source={require("../assets/settings.png")} style={styles.opImg}></Image> 
+                    <Image source={require("../assets/settings.png")} style={styles.opImg}></Image>
                 </ActionButton.Item>
             </ActionButton>
             {character ? (
@@ -310,7 +346,7 @@ const styles = StyleSheet.create({
         objectFit: 'contain',
         height: '80%',
         weight: "80%",
-        backgroundColor:'transparent'
+        backgroundColor: 'transparent'
     },
     container: {
         flex: 1,

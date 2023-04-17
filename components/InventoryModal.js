@@ -30,7 +30,6 @@ export default function Inventory({setShouldShowInventory,monsterInfo}) {
         10: require('../assets/10.png'),
         11: require('../assets/11.png'),
       };
-    console.log(monsterInfo[0]._id);
     const [currMonster, setCurrMonster] = useState({});
     const [monsterDescription, setMonsterDescription] = useState(false);
 
