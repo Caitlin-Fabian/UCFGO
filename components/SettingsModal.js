@@ -8,6 +8,7 @@ import {
     Image,
     Button,
     Pressable,
+    TextInput,
     TouchableOpacity,
 } from 'react-native';
 import ActionButton from 'react-native-action-button';
@@ -21,7 +22,6 @@ export default function Settings({
     navigation,
     setShouldShowSettings,
     userInfo,
-    TextInput,
 }) {
     const [changeSettings, setChangeSettings] = useState(true);
     const [name, setName] = useState('');
@@ -77,20 +77,54 @@ export default function Settings({
                 </>
             ) : (
                 <>
-                    <View style={styles.login}>
-                        <Text style={styles.inputBoxText}>Username:</Text>
+                    <View style={styles.editingContainer}>
+                        <Text
+                            style={{
+                                fontSize: 20,
+                                color: '#fff',
+                            }}
+                        >
+                            Name:
+                        </Text>
                         <TextInput
-                            style={styles.inputBox}
+                            style={styles.changeNameInput}
                             onChangeText={setName}
-                            value={'palce'}
+                            value={name}
                         />
-                        <Text style={styles.inputBoxText}>Email:</Text>
+                        <Text
+                            style={{
+                                fontSize: 20,
+                                color: '#fff',
+                            }}
+                        >
+                            Email:
+                        </Text>
                         <TextInput
-                            style={styles.inputBox}
-                            value={'place'}
-                            onChangeText={setEmail}
+                            style={styles.changeNameInput}
+                            onChangeText={setName}
+                            value={name}
                         />
                     </View>
+                    <TouchableOpacity
+                        onPress={() => {
+                            doLogout();
+                        }}
+                        style={styles.signOutContainer}
+                    >
+                        <Text style={{ fontWeight: 'bold', fontSize: 20 }}>
+                            SAVE CHANGES
+                        </Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                        style={styles.changePasswordContainer}
+                        onPress={() => {
+                            setChangeSettings(true);
+                        }}
+                    >
+                        <Text style={{ fontWeight: 'bold', fontSize: 20 }}>
+                            CANCEL
+                        </Text>
+                    </TouchableOpacity>
                 </>
             )}
         </View>
@@ -235,6 +269,22 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         justifyContent: 'center',
         alignItems: 'center',
+    },
+    editingContainer: {
+        top: 300,
+        alignSelf: 'center',
+        width: '80%',
+        height: '30%',
+        borderRadius: 10,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    changeNameInput: {
+        height: 40,
+        borderWidth: 1,
+        width: '100%',
+        backgroundColor: 'rgba(255, 255, 255, 0.7)',
+        borderRadius: 10,
     },
     map: {
         width: '100%',

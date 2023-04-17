@@ -9,15 +9,27 @@ import {
     Button,
     TouchableOpacity,
 } from 'react-native';
-import monsters from "./monsters";
 import ActionButton from 'react-native-action-button';
 import MapView, { Marker } from 'react-native-maps';
 import * as Location from 'expo-location';
 import { mapStyle } from '../styles/mapStyle';
 import monsterView from './monsterView';
 
+
 export default function Inventory({setShouldShowInventory,monsterInfo}) {
-    console.log(monsterInfo);
+    const imagePath = {
+        1: require('../assets/1.png'),
+        2: require('../assets/2.png'),
+        3: require('../assets/3.png'),
+        4: require('../assets/4.png'),
+        5: require('../assets/5.png'),
+        6: require('../assets/6.png'),
+        7: require('../assets/7.png'),
+        8: require('../assets/8.png'),
+        9: require('../assets/9.png'),
+        10: require('../assets/10.png'),
+        11: require('../assets/11.png'),
+      };
     const [currMonster, setCurrMonster] = useState({});
     const [monsterDescription, setMonsterDescription] = useState(false);
 
@@ -25,7 +37,6 @@ export default function Inventory({setShouldShowInventory,monsterInfo}) {
         setCurrMonster(monster);
         setMonsterDescription(true);
     }
-
     return (
         <View style={styles.greyOverlay}>
             <View style={styles.headerContainer}>
@@ -52,7 +63,7 @@ export default function Inventory({setShouldShowInventory,monsterInfo}) {
                             style={styles.monsterCard}
                             onPress={() => enterNewView(monster)}
                         >
-                            <Image style={styles.monster} source={monster.picture}/>
+                            <Image style={styles.monster} source={imagePath[monster._id]}/>
                         </TouchableOpacity>
                     </>))
 
@@ -75,18 +86,18 @@ export default function Inventory({setShouldShowInventory,monsterInfo}) {
                         source={require('../assets/BackButton.png')}
                     />
                 </TouchableOpacity>
-                <Text style={styles.titleTxt} >{currMonster.title}</Text>
+                <Text style={styles.titleTxt} >{currMonster.Name}</Text>
             </View>
-            <View >
+            <View style={styles.container} >
                 <ImageBackground
                         imageStyle={{ borderRadius: 25 }}
                         style={styles.mainMonsterStyle}
                         source={require('../assets/pokemon-background.jpg')}
                     >
-                <Image style={styles.mainMonster} source={currMonster.picture}></Image>
+                <Image style={styles.mainMonster} source={imagePath[currMonster._id]}></Image>
                 </ImageBackground>
             
-                <Text style={styles.descriptionText}>{currMonster.description}</Text>
+                <Text style={styles.descriptionText}>{currMonster.Description}</Text>
           
             </View></>)}
         </View>
@@ -95,26 +106,46 @@ export default function Inventory({setShouldShowInventory,monsterInfo}) {
 
 const styles = StyleSheet.create({
     container: {
+        top: 208,
+        position:'absolute',
         flex: 1,
-        backgroundColor: '#bebebe',
-        alignItems: 'center',
-        justifyContent: 'center',
+        width: "100%",
+        alignItems:'center',
+        // paddingHorizontal: 20,
+        // paddingVertical: 10,
+       // borderRadius: 25,
     },
-    // descriptionBackground: {
-    //     backgroundColor:"#ffffff",
-    //     top:'-35%',
-    //     height:'12%',
-    //     padding: 10
-    // },
     descriptionText: {
         padding:10,
         backgroundColor:"#ffffff",
-        position: 'absolute',
-        top: '40%',
+        top: -5,
+        height: "100%",
+        borderRadius:25,
         alignSelf: 'center',
         fontWeight: 'bold',
         fontSize: 20,
+        width:"100%"
     },
+    mainMonsterStyle: {
+        //  position: 'absolute',
+          alignItems: 'center',
+          top:0,
+          width: 500,
+          height: 500,
+          justifyContent: 'center',       
+          marginBottom: 10,
+         // borderRadius:25
+          
+      },
+      mainMonster: {
+          position: 'absolute',
+          //top:225,
+          height: "80%",
+          justifyContent: 'center',
+          alignSelf: 'center',
+          objectFit: 'contain', // Change the scale value as needed
+         // borderRadius:25
+      },
     logoContainer: {
         position: 'absolute',
         alignSelf: 'center',
@@ -138,23 +169,6 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
     },
-    mainMonsterStyle: {
-        backgroundColor: '#ffffff',
-        top:'-26%',
-        height: '80%',
-        width: '100%',
-        borderRadius:25
-        
-    },
-    mainMonster: {
-        top:0,
-        height: "80%",
-        justifyContent: 'center',
-        alignSelf: 'center',
-        objectFit: 'contain', // Change the scale value as needed
-        borderRadius:25
-    },
-
     inventoryButton: {
         height: 90,
         width: 90,

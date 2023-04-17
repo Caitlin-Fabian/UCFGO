@@ -20,7 +20,7 @@ import ActionButton from 'react-native-action-button';
 const height = Dimensions.get('window').height;
 const width = Dimensions.get('window').width;
 
-export default function LoginPage({ navigation }) {
+export default function LoginPage({ route, navigation }) {
     const [message, setMessage] = useState('');
     const [loginUsername, setLoginUsername] = useState('');
     const [loginPassword, setLoginPassword] = useState('');
@@ -35,6 +35,9 @@ export default function LoginPage({ navigation }) {
 
     const animation = useRef(new Animated.Value(0)).current;
     const scrollView = useRef();
+
+    const {verifyText} = route.params ? route.params:"";
+
     var storage = require('../tokenStorage.js');
     var jwtDecode = require('jwt-decode');
 
@@ -69,7 +72,7 @@ export default function LoginPage({ navigation }) {
                 console.log(json);
                 if (json.error) {
                     setLoginMessage('User/Password combination incorrect');
-                } else {
+                }  else {
                     var ud;
                     console.log('Success');
                     storage.storeToken(json);
@@ -80,14 +83,20 @@ export default function LoginPage({ navigation }) {
                         .retrieveToken()
                         .then((data) => data)
                         .then((value) => {
-                            console.log('Horrary' + value);
+                            // console.log('Horrary' + value);
                             ud = jwt_decode(value);
-                            console.log(ud);
-                            navigation.navigate('Map', {
-                                userID: ud.userID,
-                                Name: ud.Name,
-                                score: ud.Score,
-                            });
+                            if(!ud.isVerified){
+                                setLoginMessage("User Verified, please log in again!");
+                                navigation.navigate('Email',"");
+                            }
+                            else{
+                                console.log(ud);
+                                navigation.navigate('Map', {
+                                    userID: ud.userID,
+                                    Name: ud.Name,
+                                    score: ud.Score,
+                                });
+                            }
                         });
                 }
                 // if (json.id != -1) {
@@ -118,14 +127,14 @@ export default function LoginPage({ navigation }) {
 
     // Register Function
     const onPressRegister = async () => {
-        let js =  JSON.stringify({
+        let js = JSON.stringify({
             username: registerUsername.trim(),
             password: registerPassword.trim(),
             name: registerName.trim(),
-            email:registerEmail.trim()
+            email: registerEmail.trim(),
         });
 
-        console.log("js sent"+js);
+        console.log('js sent' + js);
         await fetch('https://ucf-go.herokuapp.com/api/register', {
             method: 'POST',
             headers: {
@@ -139,12 +148,12 @@ export default function LoginPage({ navigation }) {
                 console.log(res);
                 try {
                     json = JSON.parse(res);
-                    console.log(json.error)
+                    console.log(json.error);
                     if (json.error == 'N/A') {
                         console.log('Register success');
                         var emailJson = {
-                            userEmail: registerEmail
-                        }
+                            userEmail: registerEmail,
+                        };
                         setRegisterMessage('User registered successfully');
                         setRegisterUsername('');
                         setRegisterPassword('');
@@ -220,7 +229,7 @@ export default function LoginPage({ navigation }) {
                             <Text style={styles.inputBoxText}>Username:</Text>
                             <TextInput
                                 style={styles.inputBox}
-                                value = {loginUsername}
+                                value={loginUsername}
                                 onChangeText={(newText) =>
                                     setLoginUsername(newText)
                                 }
@@ -229,7 +238,7 @@ export default function LoginPage({ navigation }) {
                             <TextInput
                                 style={styles.inputBox}
                                 secureTextEntry
-                                value = {loginPassword}
+                                value={loginPassword}
                                 onChangeText={(newText) =>
                                     setLoginPassword(newText)
                                 }
@@ -271,38 +280,43 @@ export default function LoginPage({ navigation }) {
                         {/* Register */}
                         <View style={styles.login}>
                             <ScrollView>
-                            <Text style={styles.inputBoxText}>Username:</Text>
-                            <TextInput
-                                style={styles.inputBox}
-                               // value={registerUsername}
-                                onChangeText={(newText) =>
-                                    setRegisterUsername(newText)
-                                }
-                            />
-                            <Text style={styles.inputBoxText}>Password:</Text>
-                            <TextInput
-                                style={styles.inputBox}
-                               // value={registerPassword}
-                                onChangeText={(newText) =>
-                                    setRegisterPassword(newText)
-                                }
-                            />
-                            <Text style={styles.inputBoxText}>Name:</Text>
-                            <TextInput
-                                style={styles.inputBox}
-                              //  value={registerName}
-                                onChangeText={(newText) =>
-                                    setRegisterName(newText)
-                                }
-                            />
-                            <Text style={styles.inputBoxText}>Email:</Text>
-                            <TextInput
-                                style={styles.inputBox}
-                               // value={registerEmail}
-                                onChangeText={(newText) =>
-                                    setRegisterEmail(newText)
-                                }
-                            />
+                                <Text style={styles.inputBoxText}>
+                                    Username:
+                                </Text>
+                                <TextInput
+                                    style={styles.inputBox}
+                                    // value={registerUsername}
+                                    onChangeText={(newText) =>
+                                        setRegisterUsername(newText)
+                                    }
+                                />
+                                <Text style={styles.inputBoxText}>
+                                    Password:
+                                </Text>
+                                <TextInput
+                                    style={styles.inputBox}
+                                    secureTextEntry
+                                    // value={registerPassword}
+                                    onChangeText={(newText) =>
+                                        setRegisterPassword(newText)
+                                    }
+                                />
+                                <Text style={styles.inputBoxText}>Name:</Text>
+                                <TextInput
+                                    style={styles.inputBox}
+                                    //  value={registerName}
+                                    onChangeText={(newText) =>
+                                        setRegisterName(newText)
+                                    }
+                                />
+                                <Text style={styles.inputBoxText}>Email:</Text>
+                                <TextInput
+                                    style={styles.inputBox}
+                                    // value={registerEmail}
+                                    onChangeText={(newText) =>
+                                        setRegisterEmail(newText)
+                                    }
+                                />
                             </ScrollView>
                             <Text style={styles.smallText}>
                                 Already have an account?{' '}

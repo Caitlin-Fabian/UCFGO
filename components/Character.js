@@ -1,12 +1,14 @@
 import { StatusBar } from 'expo-status-bar';
 import React, { useEffect, useState } from 'react';
-import { ImageBackground, LogBox } from 'react-native';
+import { LogBox, TouchableHighlight } from 'react-native';
 import {
     StyleSheet,
     Text,
     View,
     Image,
     Button,
+    Pressable,
+    TextInput,
     TouchableOpacity,
 } from 'react-native';
 import ActionButton from 'react-native-action-button';
@@ -14,55 +16,57 @@ import MapView, { Marker } from 'react-native-maps';
 import * as Location from 'expo-location';
 import { mapStyle } from '../styles/mapStyle';
 
-export default function MonsterAt({setShouldShowMonster,viewedMonster, isInRange, userID}) {
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-    const imagePath = {
-        1: require('../assets/1.png'),
-        2: require('../assets/2.png'),
-        3: require('../assets/3.png'),
-        4: require('../assets/4.png'),
-        5: require('../assets/5.png'),
-        6: require('../assets/6.png'),
-        7: require('../assets/7.png'),
-        8: require('../assets/8.png'),
-        9: require('../assets/9.png'),
-        10: require('../assets/10.png'),
-        11: require('../assets/11.png'),
-      };
-    const [isMonsterInInv, setIsMonsterInInv] = useState(viewedMonster.pinColor=== '#00FF00'/*green*/ ? true: false);
-    const [userGotMonster, setUserGotMonster] = useState(false);
+export default function Character({ navigation, setCharacter, userInfo }) {
+    const [changeSettings, setChangeSettings] = useState(true);
+    const [name, setName] = useState('');
+    const [email, setEmail] = useState('');
+    const [characterNumber, setCharacterNumber] = useState(0);
 
-    const onPressGiveMonster = async() => {
-        console.log("gimme that monster" + viewedMonster.picture);
-        await fetch('https://ucf-go.herokuapp.com/api/giveMonster', {
-        method: 'POST',
-        headers: {
-            Accept: 'application/json',
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            userId: userID,
-            monsterId: viewedMonster.key,
-            monsterScore: 5, 
-        })
-        }).then((response) => response.json()).then((json) => {
-            if(json.error == 'N/A'){
-               //is working right and they have the monster
-               viewedMonster.pinColor = "#00FF00" //new color the marker becuase the person has found that monster
-               setIsMonsterInInv(true);
-               setUserGotMonster(true);
-            }
-            else{
-                console.log(json.error);
-            }
-        }).catch((error) => {
-            console.error(error);
+    console.log('HELLLLLLP ME');
+    const chooseMale = () => {
+        setCharacterNumber(1);
+    };
+
+    const chooseFemale = () => {
+        setCharacterNumber(2);
+    };
+    const chooseCharacter = async () => {
+        console.log(characterNumber);
+        let js = JSON.stringify({
+            character: characterNumber,
+            name: null,
+            username: null,
+            userId: userInfo.id,
+            email: null,
         });
-    }
+
+        await fetch('https://ucf-go.herokuapp.com/api/updateUser', {
+            method: 'POST',
+            headers: {
+                Accept: 'application/json',
+                'Content-Type': 'application/json',
+            },
+            body: js,
+        })
+            .then((response) => response.json())
+            .then((json) => {
+                console.log(json);
+                if (json.error) {
+                    setMessage('API IS NOT WORKING');
+                } else {
+                    setCharacter(false);
+                }
+            })
+            .catch((error) => {
+                console.error(error);
+            });
+    };
 
     return (
         <View style={styles.greyOverlay}>
-            <View style={styles.headerContainer}>
+            <View style={styles.characterContainer}>
                 <Image
                     style={styles.logoContainer}
                     source={require('../assets/Logo.png')}
@@ -70,30 +74,46 @@ export default function MonsterAt({setShouldShowMonster,viewedMonster, isInRange
                 <TouchableOpacity
                     style={styles.backButtonContainer}
                     activeOpacity={0.2}
-                    onPress={() => setShouldShowMonster(false)}
-                >
-                    <Image
-                        style={styles.backButton}
-                        source={require('../assets/BackButton.png')}
-                    />
-                </TouchableOpacity>
-                <Text style={styles.titleTxt}>{isMonsterInInv ? viewedMonster.title : "???"}</Text>
-                <ImageBackground
-                    imageStyle={{ borderRadius: 25 }}
-                    style={styles.profilePicContainer}
-                    source={require('../assets/pokemon-background.jpg')}
-                >
+                    onPress={() => {}}
+                />
+                <Text style={styles.titleTxt}>Choose Your Character!</Text>
+                <View style={styles.characterContainer1}>
+                    <TouchableHighlight
+                        onPress={() => {
+                            chooseMale();
+                        }}
+                    >
                         <Image
-                            style={[styles.profilePicImage, !isMonsterInInv && styles.silhouette]}
-                            source={imagePath[viewedMonster.key]}
+                            style={styles.character1}
+                            source={require('../assets/boy.png')}
                         ></Image>
-                </ImageBackground>
-                {!isMonsterInInv && isInRange && (
-                    <TouchableOpacity style = {styles.getButtonContainer} onPress={onPressGiveMonster}>
-                         <Text style={styles.getMonsterTxt}>Get This Monster</Text>
-                    </TouchableOpacity>
-                )}
+                    </TouchableHighlight>
+                </View>
+                <View style={styles.characterContainer2}>
+                    <TouchableHighlight
+                        onPress={() => {
+                            chooseFemale();
+                        }}
+                    >
+                        <Image
+                            style={styles.character2}
+                            source={require('../assets/girl.png')}
+                        />
+                    </TouchableHighlight>
+                </View>
             </View>
+
+            <TouchableOpacity
+                onPress={() => {
+                    console.log('Yay');
+                    chooseCharacter();
+                }}
+                style={styles.signOutContainer}
+            >
+                <Text style={{ fontWeight: 'bold', fontSize: 20 }}>
+                    CHOOSE!
+                </Text>
+            </TouchableOpacity>
         </View>
     );
 }
@@ -104,9 +124,6 @@ const styles = StyleSheet.create({
         backgroundColor: '#bebebe',
         alignItems: 'center',
         justifyContent: 'center',
-    },
-    silhouette: {
-        tintColor:"#008fff"
     },
     logoContainer: {
         position: 'absolute',
@@ -184,43 +201,24 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         fontSize: 40,
     },
-    getMonsterTxt: {
-        alignSelf: 'center',
-        fontWeight: 'bold',
-        fontSize: 40,
-    },
     profilePicContainer: {
         position: 'absolute',
-        top: 200,
+        top: 220,
         alignSelf: 'center',
-        //alignItems: 'center',
         backgroundColor: '#fff',
-        justifyContent: 'center',
         borderRadius: 25,
-        resizeMode: 'cover',
-        height: '150%',
-        width: '100%',
-    },
-    profilePicImage: {
-        objectFit: 'contain',
-        top: 50,
-        width: 400,
-        height: 400,
-
+        height: 250,
+        width: 250,
     },
     profileInfoContainter: {
         position: 'absolute',
         top: 500,
         alignSelf: 'center',
-        justifyContent: 'center',
-        alignItems: 'center',
         backgroundColor: '#fff',
         borderRadius: 25,
-        resizeMode: 'cover',
         height: 300,
         width: 350,
     },
-    profileInfoText: { marginTop: 10, fontWeight: 'bold', fontSize: 20 },
     monsterCardsContainer: {
         position: 'absolute',
         top: 220,
@@ -259,16 +257,56 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
     },
-    getButtonContainer: {
-        top: '350%',
-        height:'50%',
+    editingContainer: {
+        top: 300,
+        alignSelf: 'center',
+        width: '80%',
+        height: '30%',
         borderRadius: 10,
-        alignItems: 'center',
         justifyContent: 'center',
-        backgroundColor: '#ffffff',
+        alignItems: 'center',
+    },
+    changeNameInput: {
+        height: 40,
+        borderWidth: 1,
+        width: '100%',
+        backgroundColor: 'rgba(255, 255, 255, 0.7)',
+        borderRadius: 10,
     },
     map: {
         width: '100%',
         height: '100%',
+    },
+    character1: {
+        objectFit: 'contain',
+        width: '100%',
+        height: '100%',
+    },
+    character2: {
+        width: '100%',
+        height: '100%',
+        objectFit: 'contain',
+    },
+    characterContainer: {
+        position: 'absolute',
+        top: 0,
+        width: '100%',
+        height: 250,
+        backgroundColor: '#ffc700',
+        textAlign: 'center',
+    },
+    characterContainer1: {
+        position: 'absolute',
+        top: 300,
+        left: 200,
+        width: '50%',
+        height: 300,
+    },
+    characterContainer2: {
+        position: 'absolute',
+        top: 300,
+        right: 200,
+        width: '50%',
+        height: 300,
     },
 });
