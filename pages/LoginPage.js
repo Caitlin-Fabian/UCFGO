@@ -285,7 +285,7 @@ export default function LoginPage({ route, navigation }) {
                                 </Text>
                                 <TextInput
                                     style={styles.inputBox}
-                                    // value={registerUsername}
+                                    value={registerUsername}
                                     onChangeText={(newText) =>
                                         setRegisterUsername(newText)
                                     }
@@ -296,7 +296,7 @@ export default function LoginPage({ route, navigation }) {
                                 <TextInput
                                     style={styles.inputBox}
                                     secureTextEntry
-                                    // value={registerPassword}
+                                    value={registerPassword}
                                     onChangeText={(newText) =>
                                         setRegisterPassword(newText)
                                     }
@@ -304,7 +304,7 @@ export default function LoginPage({ route, navigation }) {
                                 <Text style={styles.inputBoxText}>Name:</Text>
                                 <TextInput
                                     style={styles.inputBox}
-                                    //  value={registerName}
+                                    value={registerName}
                                     onChangeText={(newText) =>
                                         setRegisterName(newText)
                                     }
@@ -312,7 +312,7 @@ export default function LoginPage({ route, navigation }) {
                                 <Text style={styles.inputBoxText}>Email:</Text>
                                 <TextInput
                                     style={styles.inputBox}
-                                    // value={registerEmail}
+                                    value={registerEmail}
                                     onChangeText={(newText) =>
                                         setRegisterEmail(newText)
                                     }
