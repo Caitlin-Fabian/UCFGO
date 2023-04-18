@@ -62,7 +62,7 @@ export default function MapScreen({ route, navigation }) {
     function canInteract(coords) {
         const distance = Math.sqrt(
             Math.pow(coords.latitude - currLocation.coords.latitude, 2) +
-            Math.pow(coords.longitude - currLocation.coords.longitude, 2)
+                Math.pow(coords.longitude - currLocation.coords.longitude, 2)
         );
         if (distance <= 0.0008) return true;
         else return false;
@@ -73,7 +73,7 @@ export default function MapScreen({ route, navigation }) {
         let locations = [];
         await getUserInfo();
         await getMonsters();
-         getUserLocation();
+        getUserLocation();
         let newPush = [];
         //can now user userInfo.monsters for the users current monsters
         for (let x = 0; x < monsters.length; x++) {
@@ -84,17 +84,15 @@ export default function MapScreen({ route, navigation }) {
             let pos = {
                 latitude: parseFloat(monsters[x].lat),
                 longitude: parseFloat(monsters[x].lng),
-            }
-            let pc = ""//red default
+            };
+            let pc = ''; //red default
             if (includes) {
-                pc = '#00FF00';//green
-            }
-            else if (canInteract(pos)) {
-                pc = ''//yellow
-                pc = "#FFFF00"
-            }
-            else {
-                pc = '#FF0000'
+                pc = '#00FF00'; //green
+            } else if (canInteract(pos)) {
+                pc = ''; //yellow
+                pc = '#FFFF00';
+            } else {
+                pc = '#FF0000';
             }
             //monsters[x].push({picture: imagePath[monsters[x]._id],})
             locations.push({
@@ -107,19 +105,19 @@ export default function MapScreen({ route, navigation }) {
             //console.log('pos' + locations[x].picture);
         }
         if (locations.length !== 0) {
-            console.log("loc" + locations.length);
+            console.log('loc' + locations.length);
             setMonstersOfUser(newPush);
             setIcons(locations);
         }
-    }
+    };
 
     const createIconsWait = async () => {
         // console.log("update check");
-        await new Promise((resolve) => setTimeout(resolve, 1000)).then(
+        await new Promise((resolve) => setTimeout(resolve, 2000)).then(
             async () => {
                 createIcons();
-            })
-
+            }
+        );
     };
 
     // user to retrieve user info
@@ -191,7 +189,7 @@ export default function MapScreen({ route, navigation }) {
             });
     });
 
-    const getUserLocation = async() => {
+    const getUserLocation = async () => {
         let { status } = await Location.requestForegroundPermissionsAsync();
         if (status !== 'granted') {
             setErrorMsg('Permission to access location was denied');
@@ -199,34 +197,33 @@ export default function MapScreen({ route, navigation }) {
         }
 
         let location = await Location.getCurrentPositionAsync({});
-       
+
         setCurrLocation(location);
         //console.log('location ping' + currLocation.coords.latitude);
-            
-    }
+    };
 
     // useEffect(() => {
     //     (async () => {
-           
+
     //     })();
     // }, [currLocation]);
 
     useEffect(() => {
         getMonsters();
         getUserInfo();
-    }, [token, userInfo]);
+    }, [token]);
 
     useEffect(() => {
-        if(first){
+        if (first) {
             createIcons();
             setFirst(false);
         } else {
             createIconsWait();
         }
-        
+
         chooseCharacter();
         //('went into markers use effect');
-    }, [userInfo.monsters]);
+    }, [userInfo.monsters, userInfo]);
 
     return (
         <View style={styles.container}>
@@ -263,22 +260,30 @@ export default function MapScreen({ route, navigation }) {
                 style={styles.logoContainer}
                 source={require('../assets/Logo.png')}
             />
-            {icons.length===0 && (
-                <Text style= {styles.titleTxt}>Loading...</Text>
+            {icons.length === 0 && (
+                <Text style={styles.titleTxt}>Loading...</Text>
             )}
-            <ActionButton autoInactive={true} buttonColor='#ffc700'
+            <ActionButton
+                autoInactive={true}
+                buttonColor="#ffc700"
                 renderIcon={() => (
-                    <Image source={require("../assets/threeBar.png")} style={styles.opImg} />
-                )}>
+                    <Image
+                        source={require('../assets/threeBar.png')}
+                        style={styles.opImg}
+                    />
+                )}
+            >
                 <ActionButton.Item
                     onPress={() => {
                         setShouldShowProfile(!shouldShowProfile);
                         setShouldShowButtons(!shouldShowButtons);
                     }}
-                    buttonColor='#ffc700'
+                    buttonColor="#ffc700"
                 >
-
-                    <Image source={require("../assets/profile.png")} style={styles.opImg}></Image>
+                    <Image
+                        source={require('../assets/profile.png')}
+                        style={styles.opImg}
+                    ></Image>
                     {/* <Text style={styles.opTxt}>profile</Text> */}
                 </ActionButton.Item>
 
@@ -287,9 +292,12 @@ export default function MapScreen({ route, navigation }) {
                         setShouldShowInventory(!shouldShowInventory);
                         setShouldShowButtons(!shouldShowButtons);
                     }}
-                    buttonColor='#ffc700'
+                    buttonColor="#ffc700"
                 >
-                    <Image source={require("../assets/inventory.png")} style={styles.opImg}></Image>
+                    <Image
+                        source={require('../assets/inventory.png')}
+                        style={styles.opImg}
+                    ></Image>
                 </ActionButton.Item>
 
                 <ActionButton.Item
@@ -297,9 +305,12 @@ export default function MapScreen({ route, navigation }) {
                         setShouldShowSettings(!shouldShowSettings);
                         setShouldShowButtons(!shouldShowButtons);
                     }}
-                    buttonColor='#ffc700'
+                    buttonColor="#ffc700"
                 >
-                    <Image source={require("../assets/settings.png")} style={styles.opImg}></Image>
+                    <Image
+                        source={require('../assets/settings.png')}
+                        style={styles.opImg}
+                    ></Image>
                 </ActionButton.Item>
             </ActionButton>
             {character ? (
@@ -345,8 +356,8 @@ const styles = StyleSheet.create({
     opImg: {
         objectFit: 'contain',
         height: '80%',
-        weight: "80%",
-        backgroundColor: 'transparent'
+        weight: '80%',
+        backgroundColor: 'transparent',
     },
     container: {
         flex: 1,

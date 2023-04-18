@@ -32,6 +32,7 @@ export default function Settings({
     const [newEmail, setNewEmail] = useState(null);
     const [newUsername, setNewUsername] = useState(null);
     const [selectedCharacter, setSelectedCharacter] = useState(1);
+    const [character, setCharacter] = useState(0);
 
     const doLogout = () => {
         navigation.navigate('Login');
@@ -68,7 +69,6 @@ export default function Settings({
                         Name: userInfo.Name,
                         score: userInfo.Score,
                     });
-                    forceUpdate;
                     setMessage('Updated Successfully');
                 } else {
                     setMessage('User or Email Already Exists');
@@ -79,12 +79,11 @@ export default function Settings({
             });
     };
     const handleSelected = (character) => {
-        parseInt(character);
-        console.log(character);
-        setSelectedCharacter(character);
+        console.log(character.itemValue);
+        setSelectedCharacter(parseInt(character.itemValue));
+        setCharacter(character.itemValue);
     };
 
-    console.log('hello');
     return (
         <View style={styles.greyOverlay}>
             <View style={styles.headerContainer}>
@@ -206,7 +205,7 @@ export default function Settings({
                             ></Image>
 
                             <Picker
-                                selectedValue={selectedCharacter}
+                                selectedValue={character}
                                 itemStyle={{ color: 'white', top: -40 }}
                                 onValueChange={(itemValue, itemIndex) =>
                                     handleSelected({ itemValue })
