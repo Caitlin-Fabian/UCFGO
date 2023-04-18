@@ -96,8 +96,8 @@ export default function Inventory({setShouldShowInventory,monsterInfo}) {
                     >
                 <Image style={styles.mainMonster} source={imagePath[currMonster._id]}></Image>
                 </ImageBackground>
-            
                 <Text style={styles.descriptionText}>{currMonster.Description}</Text>
+                <Text style={styles.locationText}>Location:{currMonster.Location}</Text>
           
             </View></>)}
         </View>
@@ -118,7 +118,18 @@ const styles = StyleSheet.create({
     descriptionText: {
         padding:10,
         backgroundColor:"#ffffff",
-        top: -5,
+        top: -10,
+        //height: "100%",
+        
+        alignSelf: 'center',
+        fontWeight: 'bold',
+        fontSize: 20,
+        width:"100%"
+    },
+    locationText: {
+        padding:10,
+        backgroundColor:"#ffffff",
+        top: -10,
         height: "100%",
         borderRadius:25,
         alignSelf: 'center',
