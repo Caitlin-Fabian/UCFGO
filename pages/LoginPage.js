@@ -91,6 +91,7 @@ export default function LoginPage({ route, navigation }) {
                             }
                             else{
                                 console.log(ud);
+                                setLoginMessage("");
                                 navigation.navigate('Map', {
                                     userID: ud.userID,
                                     Name: ud.Name,
@@ -337,7 +338,7 @@ export default function LoginPage({ route, navigation }) {
                                     Confirm
                                 </Text>
                             </TouchableOpacity>
-                            <Text style={styles.smallText}>
+                            {/* <Text style={styles.smallText}>
                                 Debug: go to email EmailVerification{' '}
                                 <Text
                                     onPress={() =>
@@ -349,7 +350,7 @@ export default function LoginPage({ route, navigation }) {
                                 >
                                     HERE
                                 </Text>
-                            </Text>
+                            </Text> */}
                             <Text style={styles.smallText}>
                                 {registerMessage}
                             </Text>
